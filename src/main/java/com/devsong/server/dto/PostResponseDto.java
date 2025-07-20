@@ -9,7 +9,6 @@ public class PostResponseDto {
     private final Long id;
     private final String title;
     private final String content;
-    private final String author;  // 예시로 유저의 이름 사용
     private final LocalDateTime createdAt;
     private final boolean isClosed;
 
