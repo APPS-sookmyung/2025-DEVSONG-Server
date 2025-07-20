@@ -1,12 +1,16 @@
 package com.devsong.server.user.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
+@Entity
 @Getter
 @Builder
-@Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user")
 public class UserController {
 
-    private final UserService userService;
+    private final UserService userService; //DI
 
     @PostMapping("/signup") //회원가입
     public SignupResponseDto signup(@RequestBody SignupRequestDto signupRequestDto) {

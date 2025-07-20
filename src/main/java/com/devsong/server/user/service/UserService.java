@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final UserRepository userRepository; //DI
 
-    public SignupResponseDto signup(SignupRequestDto signupRequestDto) {
+    public SignupResponseDto signup(SignupRequestDto signupRequestDto) { //회원가입
         //ReqeustDto를 Entity로 변환
         User userEntity = User.builder()
                 .email(signupRequestDto.getEmail())
@@ -20,10 +20,11 @@ public class UserService {
                 .username(signupRequestDto.getUsername())
                 .studentId(signupRequestDto.getStudentId())
                 .major(signupRequestDto.getMajor())
+                .bojId(signupRequestDto.getBojId())
+                .githubId(signupRequestDto.getGithubId())
                 .build(); //변환 완료
-        // 만약 bojid, githubid 있으면 넣기
 
-        //UserRepository.save
+        //UserRepository.save DB에 저장
         userRepository.save(userEntity);
 
         //UserRepository.FindByEmail로 id 찾기
