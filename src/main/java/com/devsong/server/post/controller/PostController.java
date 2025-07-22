@@ -17,17 +17,17 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public Long SavePost(@RequestBody PostRequestDto requestDto) {
+    public Long create(@RequestBody PostRequestDto requestDto) {
         return postService.create(requestDto);
     }
 
     @GetMapping("/{id}")
-    public PostResponseDto searchById(@PathVariable Long id) {
+    public PostResponseDto findPost(@PathVariable Long id) {
         return postService.findPost(id);
     }
 
     @GetMapping
-    public List<PostListResponseDto> searchAllDesc() {
+    public List<PostListResponseDto> findAll() {
         return postService.findAll();
     }
 

@@ -23,7 +23,6 @@ public class PostService {
         return post.getId();
     }
 
-
     @Transactional(readOnly = true)
     public PostResponseDto findPost(Long id) {
         Post post = postRepository.findById(id)
