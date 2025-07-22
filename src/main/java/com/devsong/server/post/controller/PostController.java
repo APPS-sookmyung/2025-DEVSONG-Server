@@ -1,9 +1,9 @@
-package com.devsong.server.controller;
+package com.devsong.server.post.controller;
 
-import com.devsong.server.dto.PostListResponseDto;
-import com.devsong.server.dto.PostRequestDto;
-import com.devsong.server.dto.PostResponseDto;
-import com.devsong.server.service.PostService;
+import com.devsong.server.post.dto.PostListResponseDto;
+import com.devsong.server.post.dto.PostRequestDto;
+import com.devsong.server.post.dto.PostResponseDto;
+import com.devsong.server.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

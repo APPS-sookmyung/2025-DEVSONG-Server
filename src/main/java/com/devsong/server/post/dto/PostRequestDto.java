@@ -1,8 +1,9 @@
-package com.devsong.server.dto;
+package com.devsong.server.post.dto;
 
-import com.devsong.server.domain.Category;
-import com.devsong.server.domain.Post;
-import com.devsong.server.domain.User;
+import com.devsong.server.post.entity.Category;
+import com.devsong.server.post.entity.Post;
+import com.devsong.server.user.entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,24 +12,15 @@ import java.time.LocalDateTime;
 
     @Getter
     @NoArgsConstructor
+    @Builder
+    @AllArgsConstructor
     public class PostRequestDto {
         private User user;
         private String title;
         private String content;
         private Category category;
-        private LocalDateTime createdAt;
         private boolean isClosed;
 
-
-        @Builder
-        public PostRequestDto(User user, String title, String content,
-                              Category category, boolean isClosed) {
-            this.user = user;
-            this.title = title;
-            this.content = content;
-            this.category = category;
-            this.isClosed = isClosed;
-        }
 
         public Post toEntity() {
             return Post.builder()
@@ -40,4 +32,3 @@ import java.time.LocalDateTime;
                     .build();
         }
     }
-}

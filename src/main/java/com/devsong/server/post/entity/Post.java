@@ -1,17 +1,16 @@
-package com.devsong.server.domain;
+package com.devsong.server.post.entity;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.devsong.server.user.entity.User;
+import lombok.*;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+@Builder
 @Entity
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-//@EntityListeners(AuditingEntityListener.class) - 수정시간 기록?
 public class Post {
 
     @Id
@@ -44,13 +43,4 @@ public class Post {
         this.createdAt = LocalDateTime.now();
     }
 
-    @Builder
-    public Post(User user, String title, String content,
-                Category category, boolean isClosed) {
-        this.user = user;
-        this.title = title;
-        this.content = content;
-        this.category = category;
-        this.isClosed = isClosed;
-    }
 }

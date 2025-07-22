@@ -1,10 +1,10 @@
-package com.devsong.server.service;
+package com.devsong.server.post.service;
 
-import com.devsong.server.domain.Post;
-import com.devsong.server.dto.PostListResponseDto;
-import com.devsong.server.dto.PostRequestDto;
-import com.devsong.server.dto.PostResponseDto;
-import com.devsong.server.repository.PostRepository;
+import com.devsong.server.post.entity.Post;
+import com.devsong.server.post.dto.PostListResponseDto;
+import com.devsong.server.post.dto.PostRequestDto;
+import com.devsong.server.post.dto.PostResponseDto;
+import com.devsong.server.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +18,9 @@ public class PostService {
 
     @Transactional
     public Long create(PostRequestDto requestDto) {
-        Post post = requestDto.toEntity();      // 1단계: DTO → 엔티티 변환
-        postRepository.save(post);              // 2단계: 저장
-        return post.getId();                    // 3단계: ID 반환
+        Post post = requestDto.toEntity();
+        postRepository.save(post);
+        return post.getId();
     }
 
 

@@ -1,6 +1,6 @@
-package com.devsong.server.repository;
+package com.devsong.server.post.repository;
 
-import com.devsong.server.domain.Post;
+import com.devsong.server.post.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
