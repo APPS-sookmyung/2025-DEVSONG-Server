@@ -26,15 +26,15 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PostResponseDto findPost(Long id) {
-        Post post = postRepository.findById(id).orElseThrow(()
-                -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
-        return new PostResponseDto(post);
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+        return PostResponseDto.from(post);
     }
 
     @Transactional(readOnly = true)
     public List<PostListResponseDto> findAll() {
         return postRepository.findAllByOrderByIdDesc().stream()
-                .map(PostListResponseDto::new)
+                .map(PostListResponseDto::from)
                 .toList();
     }
 }
