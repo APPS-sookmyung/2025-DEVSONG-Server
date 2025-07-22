@@ -16,11 +16,9 @@ public class PostLike {
     private Long id; //pk
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
     private User user; //유저
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
     private Post post; //게시글
 
 }

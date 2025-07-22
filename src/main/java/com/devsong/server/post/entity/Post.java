@@ -15,27 +15,21 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; //pk
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private User user; //유저
 
-    @Column(nullable = false)
-    private String title;
+    private String title; //제목
 
     @Column(columnDefinition = "TEXT", nullable = false)
-    private String content;
+    private String content; //내용
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Category category;
+    private Category category; //카테고리
 
-    @Column(nullable = false)
-    private boolean isClosed;
+    private boolean isClosed; //마감여부
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt; //작성시각
 
     @PrePersist
     protected void onCreate() {
