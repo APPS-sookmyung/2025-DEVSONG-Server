@@ -22,15 +22,10 @@ public class PostService {
 
     //게시글 등록
     @Transactional
-    public Long create(PostRequestDto requestDto, User user) {
-        Post post = Post.builder()
-                .user(user)
-                .title(requestDto.getTitle())
-                .content(requestDto.getContent())
-                .category(requestDto.getCategory())
-                .isClosed(requestDto.isClosed())
-                .build();
+    public Long create(PostRequestDto requestDto) {
+        User user = userRepository.findById(requestDto.getUserId()).get();
 
+        Post post = requestDto.toEntity(user);
         postRepository.save(post);
         return post.getId();
     }

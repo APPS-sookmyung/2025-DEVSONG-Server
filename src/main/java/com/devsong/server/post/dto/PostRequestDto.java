@@ -19,14 +19,16 @@ import java.time.LocalDateTime;
         private String content;
         private Category category;
         private boolean isClosed;
+        private Long userId;
 
 
-        public Post toEntity() {
+        public Post toEntity(User user) {
             return Post.builder()
                     .title(title)
                     .content(content)
                     .category(category)
                     .isClosed(isClosed)
+                    .user(user)
                     .build();
         }
     }

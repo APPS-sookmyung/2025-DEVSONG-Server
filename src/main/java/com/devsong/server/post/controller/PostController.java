@@ -6,7 +6,6 @@ import com.devsong.server.post.dto.PostResponseDto;
 import com.devsong.server.post.service.PostService;
 import com.devsong.server.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,9 +20,8 @@ public class PostController {
 
     //게시글 등록
     @PostMapping("/write")
-    public Long create(@RequestBody PostRequestDto requestDto,
-                       @AuthenticationPrincipal User user) {
-        return postService.create(requestDto, user);
+    public Long create(@RequestBody PostRequestDto requestDto) {
+        return postService.create(requestDto);
     }
 
 
