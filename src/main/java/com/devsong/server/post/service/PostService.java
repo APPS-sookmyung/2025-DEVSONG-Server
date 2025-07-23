@@ -1,8 +1,9 @@
 package com.devsong.server.post.service;
 
-import com.devsong.server.post.entity.Post;
+import com.devsong.server.post.dto.PostCreateRequestDto;
+import com.devsong.server.post.dto.PostCreateResponseDto;
 import com.devsong.server.post.dto.PostListResponseDto;
-import com.devsong.server.post.dto.PostRequestDto;
+import com.devsong.server.post.entity.Post;
 import com.devsong.server.post.dto.PostResponseDto;
 import com.devsong.server.post.repository.PostRepository;
 import com.devsong.server.user.entity.User;
@@ -22,12 +23,12 @@ public class PostService {
 
     //게시글 등록
     @Transactional
-    public Long create(PostRequestDto requestDto) {
+    public PostCreateResponseDto create(PostCreateRequestDto requestDto) {
         User user = userRepository.findById(requestDto.getUserId()).get();
 
         Post post = requestDto.toEntity(user);
         postRepository.save(post);
-        return post.getId();
+        return new PostCreateResponseDto(post.getId().toString());
     }
 
 

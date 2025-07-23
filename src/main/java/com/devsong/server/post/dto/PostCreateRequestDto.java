@@ -8,13 +8,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
-    @Getter
+@Getter
     @NoArgsConstructor
     @Builder
     @AllArgsConstructor
-    public class PostRequestDto {
+    public class PostCreateRequestDto {
         private String title;
         private String content;
         private Category category;

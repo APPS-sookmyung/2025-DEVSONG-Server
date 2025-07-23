@@ -1,6 +1,7 @@
 package com.devsong.server.post.dto;
 
 import com.devsong.server.post.entity.Post;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,6 +15,7 @@ public class PostResponseDto {
     private final String title;
     private final String author;
     private final String content;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private final LocalDateTime createdAt;
     private final boolean isClosed;
 
