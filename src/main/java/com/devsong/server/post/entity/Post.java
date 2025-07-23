@@ -17,6 +17,7 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; //pk
 
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user; //유저
 
     private String title; //제목

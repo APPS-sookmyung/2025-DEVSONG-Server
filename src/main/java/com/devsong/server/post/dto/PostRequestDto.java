@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
     @Builder
     @AllArgsConstructor
     public class PostRequestDto {
-        private User user;
         private String title;
         private String content;
         private Category category;
@@ -24,7 +23,6 @@ import java.time.LocalDateTime;
 
         public Post toEntity() {
             return Post.builder()
-                    .user(user)
                     .title(title)
                     .content(content)
                     .category(category)
