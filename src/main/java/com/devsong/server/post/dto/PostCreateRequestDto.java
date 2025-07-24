@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
         private String title;
         private String content;
         private Category category;
-        private boolean isClosed;
+        private boolean closed;
         private Long userId;
 
 
@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
                     .title(title)
                     .content(content)
                     .category(category)
-                    .isClosed(isClosed)
+                    .closed(closed)
                     .user(user)
                     .build();
         }

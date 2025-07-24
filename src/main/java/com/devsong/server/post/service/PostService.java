@@ -28,7 +28,7 @@ public class PostService {
 
         Post post = requestDto.toEntity(user);
         postRepository.save(post);
-        return new PostCreateResponseDto(post.getId().toString());
+        return new PostCreateResponseDto(post.getId());
     }
 
 
