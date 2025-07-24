@@ -15,7 +15,7 @@ public class PostResponseDto {
     private final String title;
     private final String author;
     private final String content;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime createdAt;
     private final boolean isClosed;
 
