@@ -1,14 +1,16 @@
-package com.devsong.server.comment.entity;
+package com.devsong.server.post.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import com.devsong.server.user.entity.User;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "comment")
 @Getter
 @Builder
 @AllArgsConstructor
@@ -18,11 +20,13 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @Column(nullable = false)
-    private Long postId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

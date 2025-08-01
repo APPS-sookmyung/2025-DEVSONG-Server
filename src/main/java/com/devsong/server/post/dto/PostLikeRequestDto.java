@@ -1,4 +1,4 @@
-package com.devsong.server.postapply.dto;
+package com.devsong.server.post.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class PostApplyRequestDto {
+public class PostLikeRequestDto {
     private Long userId;
     private Long postId;
 }

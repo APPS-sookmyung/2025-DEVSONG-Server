@@ -5,24 +5,21 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "post_like")
+@Table(name = "post_apply")
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostLike {
-
+public class PostApply {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; //pk
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user; //유저
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
-    private Post post; //게시글
-
+    private Post post;
 }
-

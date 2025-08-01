@@ -1,4 +1,4 @@
-package com.devsong.server.postlike.dto;
+package com.devsong.server.post.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
