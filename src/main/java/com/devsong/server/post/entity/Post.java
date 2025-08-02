@@ -5,6 +5,8 @@ import lombok.*;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @Entity
@@ -31,6 +33,20 @@ public class Post {
     private boolean closed; //마감여부
 
     private LocalDateTime createdAt; //작성시각
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostLike> like = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostLike> comment = new ArrayList<>();
+
+    public int getLike() {
+        return like.size();
+    }
+
+    public int getComment() {
+        return comment.size();
+    }
 
     @PrePersist
     protected void onCreate() {

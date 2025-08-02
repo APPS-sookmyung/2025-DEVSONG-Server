@@ -18,6 +18,8 @@ public class PostResponseDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime createdAt;
     private final boolean isClosed;
+    private final int like;
+    private final int comment;
 
     public static PostResponseDto from(Post post) {
         return PostResponseDto.builder()
@@ -27,6 +29,8 @@ public class PostResponseDto {
                 .author(post.getUser().getUsername())
                 .createdAt(post.getCreatedAt())
                 .isClosed(post.isClosed())
+                .like(post.getLike())
+                .comment(post.getComment())
                 .build();
     }
 }
