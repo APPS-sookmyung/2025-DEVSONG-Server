@@ -9,24 +9,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-    @NoArgsConstructor
-    @Builder
-    @AllArgsConstructor
-    public class PostCreateRequestDto {
-        private String title;
-        private String content;
-        private Category category;
-        private boolean closed;
-        private Long userId;
-
-
-        public Post toEntity(User user) {
-            return Post.builder()
-                    .title(title)
-                    .content(content)
-                    .category(category)
-                    .closed(closed)
-                    .user(user)
-                    .build();
-        }
-    }
+@NoArgsConstructor
+@Builder
+@AllArgsConstructor
+public class PostCreateRequestDto {
+    private String title;
+    private String content;
+    private Category category;
+    private Long userId;
+}
