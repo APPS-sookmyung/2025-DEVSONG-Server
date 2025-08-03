@@ -36,6 +36,12 @@ public class CommentService {
 
         Comment saved = commentRepository.save(comment);
 
-        return new CommentResponseDto(saved.getId());
+        return CommentResponseDto.builder()
+                .commentId(saved.getId())
+                .userId(user.getId())
+                .postId(post.getId())
+                .content(saved.getContent())
+                .createdAt(saved.getCreatedAt())
+                .build();
     }
 }

@@ -26,7 +26,10 @@ public class PostLikeService {
 
         if (exists) {
             postLikeRepository.deleteByUserIdAndPostId(dto.getUserId(), dto.getPostId());
-            return new PostLikeResponseDto(null);
+            return PostLikeResponseDto.builder()
+                    .postLikeId(null)
+                    .userId(dto.getUserId())
+                    .build();
         } else {
             Post post = postRepository.findById(dto.getPostId())
                     .orElseThrow(() -> new RuntimeException("Post not found"));
@@ -34,13 +37,17 @@ public class PostLikeService {
             User user = userRepository.findById(dto.getUserId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            PostLike postLikeEntity = PostLike.builder()
+            PostLike postLike = PostLike.builder()
                     .user(user)
                     .post(post)
                     .build();
 
-            postLikeRepository.save(postLikeEntity);
-            return new PostLikeResponseDto(postLikeEntity.getId());
+            postLikeRepository.save(postLike);
+
+            return PostLikeResponseDto.builder()
+                    .postLikeId(postLike.getId())
+                    .userId(user.getId())
+                    .build();
         }
     }
 }

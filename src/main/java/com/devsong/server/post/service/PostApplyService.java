@@ -35,6 +35,9 @@ public class PostApplyService {
 
         PostApply saved = postApplyRepository.save(postApply);
 
-        return new PostApplyResponseDto(saved.getId());
+        return PostApplyResponseDto.builder()
+                .postApplyId(saved.getId())
+                .userId(user.getId())
+                .build();
     }
 }

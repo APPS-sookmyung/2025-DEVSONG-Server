@@ -53,19 +53,21 @@ public class PostController {
         return postService.findAll();
     }
 
-
+    //게시글 댓글 작성
     @PostMapping("/comment")
     public ResponseEntity<CommentResponseDto> saveComment(@RequestBody CommentRequestDto dto) {
         CommentResponseDto response = commentService.addComment(dto);
         return ResponseEntity.ok(response);
     }
 
+    //게시글에 지원하기
     @PostMapping("/apply")
     public ResponseEntity<PostApplyResponseDto> apply(@RequestBody PostApplyRequestDto dto) {
         PostApplyResponseDto response = postApplyService.applyPost(dto);
         return ResponseEntity.ok(response);
     }
 
+    //게시글 좋아요 누르기 및 취소하기
     @PostMapping("/like")
     public ResponseEntity<PostLikeResponseDto> toggle(@RequestBody PostLikeRequestDto dto) {
         PostLikeResponseDto response = postLikeService.togglePostLike(dto);
