@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class PostListResponseDto {
     private final Long id;
     private final String title;
-    private final String author;
+    private final String username;
     private final String content;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime createdAt;
@@ -26,7 +26,7 @@ public class PostListResponseDto {
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
-                .author(post.getUser().getUsername())
+                .username(post.getUser().getUsername())
                 .createdAt(post.getCreatedAt())
                 .isClosed(post.isClosed())
                 .like(post.getLike())
