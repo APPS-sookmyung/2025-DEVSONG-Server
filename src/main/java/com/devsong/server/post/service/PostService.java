@@ -1,10 +1,7 @@
 package com.devsong.server.post.service;
 
-import com.devsong.server.post.dto.PostCreateRequestDto;
-import com.devsong.server.post.dto.PostCreateResponseDto;
-import com.devsong.server.post.dto.PostListResponseDto;
+import com.devsong.server.post.dto.*;
 import com.devsong.server.post.entity.Post;
-import com.devsong.server.post.dto.PostResponseDto;
 import com.devsong.server.post.repository.PostRepository;
 import com.devsong.server.user.entity.User;
 import com.devsong.server.user.repository.UserRepository;
@@ -24,9 +21,18 @@ public class PostService {
     //게시글 등록
     @Transactional
     public PostCreateResponseDto create(PostCreateRequestDto requestDto) {
-        User user = userRepository.findById(requestDto.getUserId()).get();
+        User user = userRepository.findById(requestDto.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾을 수 없습니다."));
 
-        Post post = requestDto.toEntity(user);
+        //RequestDto -> Entity 변환
+        Post post = Post.builder()
+                .title(requestDto.getTitle())
+                .content(requestDto.getContent())
+                .category(requestDto.getCategory())
+                .closed(false) //마감여부 : dafualt 값을 false로
+                .user(user)
+                .build();
+
         postRepository.save(post);
         return new PostCreateResponseDto(post.getId());
     }
