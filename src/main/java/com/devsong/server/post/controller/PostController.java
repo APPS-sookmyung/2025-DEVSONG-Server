@@ -1,19 +1,7 @@
 package com.devsong.server.post.controller;
 
-import com.devsong.server.post.dto.CommentRequestDto;
-import com.devsong.server.post.dto.CommentResponseDto;
-import com.devsong.server.post.service.CommentService;
-import com.devsong.server.post.dto.PostCreateResponseDto;
-import com.devsong.server.post.dto.PostListResponseDto;
-import com.devsong.server.post.dto.PostResponseDto;
-import com.devsong.server.post.dto.PostCreateRequestDto;
-import com.devsong.server.post.service.PostService;
-import com.devsong.server.post.dto.PostApplyRequestDto;
-import com.devsong.server.post.dto.PostApplyResponseDto;
-import com.devsong.server.post.service.PostApplyService;
-import com.devsong.server.post.dto.PostLikeRequestDto;
-import com.devsong.server.post.dto.PostLikeResponseDto;
-import com.devsong.server.post.service.PostLikeService;
+import com.devsong.server.post.dto.*;
+import com.devsong.server.post.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,8 +29,8 @@ public class PostController {
 
     //게시글 상세정보 조회
     @GetMapping("/{id}")
-    public ResponseEntity<PostResponseDto> getPost(@PathVariable Long id) {
-        PostResponseDto responseDto = postService.findPost(id);
+    public ResponseEntity<PostDetailResponseDto> getPost(@PathVariable Long id) {
+        PostDetailResponseDto responseDto = postService.findPost(id);
         return ResponseEntity.ok(responseDto);
     }
 
