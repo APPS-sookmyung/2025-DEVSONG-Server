@@ -25,22 +25,5 @@ public class PostResponseDto {
     private final int comment;
     private final List<CommentResponseDto> comments;
 
-    public static PostResponseDto from(Post post) {
-        return PostResponseDto.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .username(post.getUser().getUsername())
-                .createdAt(post.getCreatedAt())
-                .isClosed(post.isClosed())
-                .like(post.getLike())
-                .comment(post.getComment())
-                .comments(
-                        post.getPostCommentList().stream()
-                                .map(comment -> CommentResponseDto.fromEntity(comment))
-                                .collect(Collectors.toList())
-                )
-                .build();
-    }
 }
 

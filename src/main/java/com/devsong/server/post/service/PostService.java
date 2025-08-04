@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +44,26 @@ public class PostService {
     public PostResponseDto findPost(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
-        return PostResponseDto.from(post);
+        return new PostResponseDto(
+                post.getId(),
+                post.getTitle(),
+                post.getUser().getUsername(),
+                post.getContent(),
+                post.getCreatedAt(),
+                post.isClosed(),
+                post.getLike(),
+                post.getComment(),
+                post.getPostCommentList().stream()
+                        .map(comment -> new CommentResponseDto(
+                                comment.getId(),
+                                comment.getUser().getId(),
+                                comment.getPost().getId(),
+                                comment.getContent(),
+                                comment.getCreatedAt()
+                        ))
+                        .toList()
+                );
+
     }
 
 
@@ -51,7 +71,16 @@ public class PostService {
     @Transactional(readOnly = true)
     public List<PostListResponseDto> findAll() {
         return postRepository.findAllByOrderByIdDesc().stream()
-                .map(PostListResponseDto::from)
+                .map(post -> new PostListResponseDto(
+                        post.getId(),
+                        post.getTitle(),
+                        post.getContent(),
+                        post.getUser().getUsername(),
+                        post.getCreatedAt(),
+                        post.isClosed(),
+                        post.getLike(),
+                        post.getComment()
+                ))
                 .toList();
     }
 }

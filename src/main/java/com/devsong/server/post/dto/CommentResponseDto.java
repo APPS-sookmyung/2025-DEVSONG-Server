@@ -21,13 +21,4 @@ public class CommentResponseDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
-    public static CommentResponseDto fromEntity(Comment comment) {
-        return new CommentResponseDto(
-                comment.getId(),
-                comment.getUser().getId(),
-                comment.getPost().getId(),
-                comment.getContent(),
-                comment.getCreatedAt()
-        );
-    }
 }

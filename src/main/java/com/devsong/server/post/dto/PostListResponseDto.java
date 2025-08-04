@@ -21,18 +21,6 @@ public class PostListResponseDto {
     private final int like;
     private final int comment;
 
-    public static PostListResponseDto from(Post post) {
-        return PostListResponseDto.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .username(post.getUser().getUsername())
-                .createdAt(post.getCreatedAt())
-                .isClosed(post.isClosed())
-                .like(post.getLike())
-                .comment(post.getComment())
-                .build();
-    }
 }
 
 
