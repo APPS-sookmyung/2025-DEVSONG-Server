@@ -15,10 +15,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CommentResponseDto {
     private Long commentId;
-    private Long userId;
-    private Long postId;
+    private String username;
     private String content;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "MM/dd")
     private LocalDateTime createdAt;
 
 }

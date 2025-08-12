@@ -38,8 +38,7 @@ public class CommentService {
 
         return CommentResponseDto.builder()
                 .commentId(saved.getId())
-                .userId(user.getId())
-                .postId(post.getId())
+                .username(user.getUsername())
                 .content(saved.getContent())
                 .createdAt(saved.getCreatedAt())
                 .build();

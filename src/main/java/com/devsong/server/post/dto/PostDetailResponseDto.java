@@ -1,5 +1,6 @@
 package com.devsong.server.post.dto;
 
+import com.devsong.server.post.entity.Category;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,10 @@ public class PostDetailResponseDto {
     private final String title;
     private final String username;
     private final String content;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private final Category category;
+    private final String major;
+    private final Long studentId; //학번
+    @JsonFormat(pattern = "MM/dd")
     private final LocalDateTime createdAt;
     private final boolean closed; //마감여부
     private final Long like; //좋아요 수
