@@ -1,18 +1,24 @@
 package com.devsong.server.user.service;
 
+import com.devsong.server.jwt.JwtTokenProvider;
 import com.devsong.server.user.dto.*;
 import com.devsong.server.user.entity.User;
 import com.devsong.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @Service
 public class UserService {
 
-    private final UserRepository userRepository; //DI
+    //DI
+    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public SignupResponseDto signup(SignupRequestDto signupRequestDto) { //회원가입
+    // 회원가입
+    public SignupResponseDto signup(SignupRequestDto signupRequestDto) {
         //ReqeustDto를 Entity로 변환
         User userEntity = User.builder()
                 .email(signupRequestDto.getEmail())
@@ -34,6 +40,7 @@ public class UserService {
         return new SignupResponseDto(Id);
     }
 
+    // 로그인
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
         //RequestDto에서 email 추출
         String email = loginRequestDto.getEmail();
@@ -45,15 +52,18 @@ public class UserService {
         //UserRepository에서 비밀번호 일치하는지 확인
         //ResponseDto로 변환 후 return
         if (userEntity.getPassword().equals(password)) { //일치할 경우
+
+            String token = jwtTokenProvider.createToken(userEntity); // jwt 발급
+
             return LoginResponseDto.builder()
-                    .id(userEntity.getId())
                     .message("Login Sucess")
+                    .token(token)
                     .build();
         }
         else { //불일치할 경우
             return LoginResponseDto.builder()
-                    .id(null)
                     .message("wrong password")
+                    .token(null)
                     .build();
         }
     }
