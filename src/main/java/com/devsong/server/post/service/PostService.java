@@ -76,6 +76,7 @@ public class PostService {
                         post.getTitle(),
                         post.getContent(),
                         post.getUser().getUsername(),
+                        preview(post.getContent(), 80),
                         post.getCreatedAt(),
                         post.isClosed(),
                         post.getLike(),
