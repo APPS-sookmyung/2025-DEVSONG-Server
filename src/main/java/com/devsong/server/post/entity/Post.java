@@ -34,33 +34,6 @@ public class Post {
 
     private LocalDateTime createdAt; //작성시각
 
-    //좋아요
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostLike> postLikeList = new ArrayList<>();
-
-    //댓글
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> postCommentList = new ArrayList<>();
-
-    //지원자
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostApply> postApplyList = new ArrayList<>();
-
-    //좋아요 수
-    public int getLike() {
-        return postLikeList.size();
-    }
-
-    //댓글 수
-    public int getComment() {
-        return postCommentList.size();
-    }
-
-    //지원자 수
-    public int getApply() {
-        return postApplyList.size();
-    }
-
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

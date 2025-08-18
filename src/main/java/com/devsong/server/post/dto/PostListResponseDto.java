@@ -17,9 +17,9 @@ public class PostListResponseDto {
     private final String previewContent;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime createdAt;
-    private final boolean isClosed;
-    private final int like;
-    private final int comment;
+    private final boolean closed;
+    private final Long like;
+    private final Long comment;
 
 }
 
