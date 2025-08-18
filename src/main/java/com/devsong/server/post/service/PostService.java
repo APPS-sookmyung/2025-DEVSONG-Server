@@ -82,7 +82,7 @@ public class PostService {
                                 .id(post.getId())
                                 .title(post.getTitle())
                                 .username(post.getUser().getUsername())
-                                .content(post.getContent())
+                                .preview(preview(post.getContent(), 80))
                                 .createdAt(post.getCreatedAt())
                                 .closed(post.isClosed())
                                 .like(
@@ -94,5 +94,9 @@ public class PostService {
                                 .build()
                         )
                 .toList();
+    }
+    private String preview(String content, int limit) {
+        if (content == null) return "";
+        return content.length() > limit ? content.substring(0, limit) + "..." : content;
     }
 }

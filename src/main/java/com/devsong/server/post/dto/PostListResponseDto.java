@@ -14,7 +14,7 @@ public class PostListResponseDto {
     private final Long id;
     private final String title;
     private final String username;
-    private final String previewContent;
+    private final String preview;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime createdAt;
     private final boolean closed;
