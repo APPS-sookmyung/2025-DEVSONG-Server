@@ -57,4 +57,9 @@ public class UserService {
                     .build();
         }
     }
+
+    public EmailResponseDto checkEmail(EmailRequestDto emailRequestDto) {
+        boolean isExist = (userRepository.findByEmail(emailRequestDto.getEmail()) != null);
+        return new EmailResponseDto(!isExist);
+    }
 }
