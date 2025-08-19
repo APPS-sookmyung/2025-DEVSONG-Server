@@ -21,4 +21,9 @@ public class UserController {
     public LoginResponseDto login(@RequestBody LoginRequestDto loginRequestDto) {
         return userService.login(loginRequestDto);
     }
+
+    @PostMapping("/check-email") //이메일 중복확인
+    public EmailResponseDto checkEmail(@RequestBody EmailRequestDto emailRequestDto) {
+        return userService.checkEmail(emailRequestDto);
+    }
 }
