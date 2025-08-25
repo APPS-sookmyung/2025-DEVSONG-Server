@@ -51,6 +51,9 @@ public class PostService {
                 .title(post.getTitle())
                 .username(post.getUser().getUsername())
                 .content(post.getContent())
+                .category(post.getCategory())
+                .major(post.getUser().getMajor())
+                .studentId(post.getUser().getStudentId())
                 .createdAt(post.getCreatedAt())
                 .closed(post.isClosed())
                 .like(
@@ -63,8 +66,7 @@ public class PostService {
                         commentRepository.findByPostId(post.getId()).stream()
                                 .map(comment -> CommentResponseDto.builder()
                                         .commentId(comment.getId())
-                                        .userId(comment.getUser().getId())
-                                        .postId(comment.getPost().getId())
+                                        .username(comment.getUser().getUsername())
                                         .content(comment.getContent())
                                         .createdAt(comment.getCreatedAt())
                                         .build()
@@ -93,6 +95,11 @@ public class PostService {
                                 )
                                 .build()
                         )
+                        .comment(
+                                commentRepository.countByPostId(post.getId())
+                        )
+                        .build()
+                )
                 .toList();
     }
     private String preview(String content, int limit) {
