@@ -81,14 +81,19 @@ public class PostService {
     public List<PostListResponseDto> findAll() {
         return postRepository.findAllByOrderByIdDesc().stream()
                 .map(post -> PostListResponseDto.builder()
-                        .id(post.getId())
-                        .title(post.getTitle())
-                        .username(post.getUser().getUsername())
-                        .content(post.getContent())
-                        .createdAt(post.getCreatedAt())
-                        .closed(post.isClosed())
-                        .like(
-                                postLikeRepository.countByPostId(post.getId())
+                                .id(post.getId())
+                                .title(post.getTitle())
+                                .username(post.getUser().getUsername())
+                                .preview(preview(post.getContent(), 80))
+                                .createdAt(post.getCreatedAt())
+                                .closed(post.isClosed())
+                                .like(
+                                        postLikeRepository.countByPostId(post.getId())
+                                )
+                                .comment(
+                                        commentRepository.countByPostId(post.getId())
+                                )
+                                .build()
                         )
                         .comment(
                                 commentRepository.countByPostId(post.getId())
@@ -96,5 +101,9 @@ public class PostService {
                         .build()
                 )
                 .toList();
+    }
+    private String preview(String content, int limit) {
+        if (content == null) return "";
+        return content.length() > limit ? content.substring(0, limit) + "..." : content;
     }
 }
