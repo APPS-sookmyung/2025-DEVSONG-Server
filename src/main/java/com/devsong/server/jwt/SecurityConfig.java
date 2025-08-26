@@ -19,7 +19,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         //회원가입, 로그인 api 요청은 토큰 없이 가능하도록 허용
-                        .requestMatchers("/user/signup", "/user/login").permitAll()
+                        .requestMatchers("/user/signup", "/user/login", "/user/check-email").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
