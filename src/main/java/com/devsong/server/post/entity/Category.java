@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum Category {
     PROJECT("project"),
     STUDY("study"),
-    ACTIVITY("activity"),
+    EXTRA("extra"),
     FREE("free"),
     INFO("info");
     // 프로젝트, 스터디, 대외활동, 정보, 자유
