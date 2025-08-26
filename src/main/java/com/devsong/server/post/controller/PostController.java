@@ -36,7 +36,7 @@ public class PostController {
 
 
     //전체 게시글 목록 조회
-    @GetMapping("/list")
+    @GetMapping
     public List<PostListResponseDto> findAll() {
         return postService.findAll();
     }
