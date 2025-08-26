@@ -10,6 +10,8 @@ import com.devsong.server.user.entity.User;
 import com.devsong.server.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,20 +24,24 @@ public class PostLikeService {
 
     @Transactional
     public PostLikeResponseDto togglePostLike(PostLikeRequestDto dto) {
-        boolean exists = postLikeRepository.existsByUserIdAndPostId(dto.getUserId(), dto.getPostId());
+
+        //jwt로 유저 정보 얻기
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = (Long) auth.getPrincipal();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾을 수 없습니다."));
+
+        boolean exists = postLikeRepository.existsByUserIdAndPostId(userId, dto.getPostId());
 
         if (exists) {
-            postLikeRepository.deleteByUserIdAndPostId(dto.getUserId(), dto.getPostId());
+            postLikeRepository.deleteByUserIdAndPostId(userId, dto.getPostId());
             return PostLikeResponseDto.builder()
                     .postLikeId(null)
-                    .userId(dto.getUserId())
                     .build();
         } else {
             Post post = postRepository.findById(dto.getPostId())
                     .orElseThrow(() -> new RuntimeException("Post not found"));
-
-            User user = userRepository.findById(dto.getUserId())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
 
             PostLike postLike = PostLike.builder()
                     .user(user)
@@ -46,7 +52,6 @@ public class PostLikeService {
 
             return PostLikeResponseDto.builder()
                     .postLikeId(postLike.getId())
-                    .userId(user.getId())
                     .build();
         }
     }

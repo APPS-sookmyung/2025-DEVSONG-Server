@@ -16,5 +16,4 @@ public class PostCreateRequestDto {
     private String title;
     private String content;
     private Category category;
-    private Long userId;
 }
