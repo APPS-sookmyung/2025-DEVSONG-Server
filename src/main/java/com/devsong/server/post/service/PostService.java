@@ -94,11 +94,6 @@ public class PostService {
                                         commentRepository.countByPostId(post.getId())
                                 )
                                 .build()
-                        )
-                        .comment(
-                                commentRepository.countByPostId(post.getId())
-                        )
-                        .build()
                 )
                 .toList();
     }
