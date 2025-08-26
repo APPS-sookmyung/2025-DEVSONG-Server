@@ -37,7 +37,7 @@ public class UserService {
         Long Id = userRepository.findByEmail(userEntity.getEmail()).getId();
 
         //id 를 ResponseDto로 변환 후 return
-        return new SignupResponseDto(Id);
+        return new SignupResponseDto("SignUp Success");
     }
 
     // 로그인

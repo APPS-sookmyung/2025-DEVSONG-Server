@@ -7,5 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class SignupResponseDto {
 
-    private Long id;
+    private String message;
 }
