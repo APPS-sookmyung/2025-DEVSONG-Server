@@ -6,5 +6,5 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class EmailResponseDto {
-    private boolean uniqueness;
+    private boolean available;
 }
