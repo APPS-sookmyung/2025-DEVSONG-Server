@@ -99,8 +99,10 @@ public class PostService {
 
     //카테고리별 게시글 목록 조회
     @Transactional(readOnly = true)
-    public List<PostListResponseDto> findByCategory(Category category) {
-        return postRepository.findAllByCategoryOrderByIdDesc(category).stream()
+    public List<PostListResponseDto> findByCategory(String category) {
+        Category categoryEnum = Category.from(category);
+        return postRepository.findAllByCategoryOrderByIdDesc(categoryEnum)
+                .stream()
                 .map(post -> PostListResponseDto.builder()
                         .id(post.getId())
                         .title(post.getTitle())

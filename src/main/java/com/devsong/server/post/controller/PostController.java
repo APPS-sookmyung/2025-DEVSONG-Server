@@ -43,8 +43,8 @@ public class PostController {
     }
 
     //카테고리별 조회
-    @GetMapping("/category/{category}")
-    public List<PostListResponseDto> findByCategory(@PathVariable Category category) {
+    @GetMapping("/category")
+    public List<PostListResponseDto> findByCategory(@RequestParam String category) {
         return postService.findByCategory(category);
     }
 
