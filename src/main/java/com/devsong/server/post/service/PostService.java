@@ -6,6 +6,8 @@ import com.devsong.server.user.entity.User;
 import com.devsong.server.post.repository.*;
 import com.devsong.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +24,12 @@ public class PostService {
     //게시글 등록
     @Transactional
     public PostCreateResponseDto create(PostCreateRequestDto requestDto) {
-        User user = userRepository.findById(requestDto.getUserId())
+
+        //jwt로 유저 정보 얻기
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = (Long) auth.getPrincipal();
+
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾을 수 없습니다."));
 
         //RequestDto -> Entity 변환
@@ -94,7 +101,7 @@ public class PostService {
                                         commentRepository.countByPostId(post.getId())
                                 )
                                 .build()
-                        )
+                )
                 .toList();
     }
     private String preview(String content, int limit) {

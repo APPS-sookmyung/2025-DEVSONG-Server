@@ -10,6 +10,5 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 public class PostApplyRequestDto {
-    private Long userId;
     private Long postId;
 }
