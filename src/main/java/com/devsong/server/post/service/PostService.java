@@ -1,6 +1,7 @@
 package com.devsong.server.post.service;
 
 import com.devsong.server.post.dto.*;
+import com.devsong.server.post.entity.Category;
 import com.devsong.server.post.entity.Post;
 import com.devsong.server.user.entity.User;
 import com.devsong.server.post.repository.*;
@@ -104,8 +105,32 @@ public class PostService {
                 )
                 .toList();
     }
+
+    //카테고리별 게시글 목록 조회
+    @Transactional(readOnly = true)
+    public List<PostListResponseDto> findByCategory(Category category) {
+        return postRepository.findAllByCategoryOrderByIdDesc(category).stream()
+                .map(post -> PostListResponseDto.builder()
+                        .id(post.getId())
+                        .title(post.getTitle())
+                        .username(post.getUser().getUsername())
+                        .preview(preview(post.getContent(), 80))
+                        .createdAt(post.getCreatedAt())
+                        .closed(post.isClosed())
+                        .like(
+                                postLikeRepository.countByPostId(post.getId())
+                        )
+                        .comment(
+                                commentRepository.countByPostId(post.getId())
+                        )
+                        .build()
+                )
+                .toList();
+    }
+
     private String preview(String content, int limit) {
         if (content == null) return "";
         return content.length() > limit ? content.substring(0, limit) + "..." : content;
     }
 }
+

@@ -1,6 +1,7 @@
 package com.devsong.server.post.controller;
 
 import com.devsong.server.post.dto.*;
+import com.devsong.server.post.entity.Category;
 import com.devsong.server.post.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,13 @@ public class PostController {
     public List<PostListResponseDto> findAll() {
         return postService.findAll();
     }
+
+    //카테고리별 조회
+    @GetMapping("/category/{category}")
+    public List<PostListResponseDto> findByCategory(@PathVariable Category category) {
+        return postService.findByCategory(category);
+    }
+
 
     //게시글 댓글 작성
     @PostMapping("/comment")
