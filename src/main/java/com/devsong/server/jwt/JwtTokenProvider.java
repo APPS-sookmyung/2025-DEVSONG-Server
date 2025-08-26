@@ -32,27 +32,17 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expirationDate = new Date(now.getTime() + expirationTime); // 유효시간 계산
 
-        return Jwts.builder() // 토큰 생성하여 반환
-                .setSubject(user.getEmail())
-                .claim("id", user.getId())
-                .claim("username", user.getUsername())
+        return Jwts.builder() //토큰에 유저 정보 넣어서 반환
+                .setSubject(user.getId().toString())
                 .setIssuedAt(now)
                 .setExpiration(expirationDate)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // 클라이언트가 보낸 토큰에서 claims 꺼내기
+    // 클라이언트가 보낸 토큰에서 claims 꺼내서 userId 얻기
     public Long getUserId(String token) {
-        return getClaims(token).get("id", Long.class);
-    }
-
-    public String getEmail(String token) {
-        return getClaims(token).getSubject();
-    }
-
-    public String getUsername(String token) {
-        return getClaims(token).get("username", String.class);
+        return Long.valueOf(getClaims(token).getSubject());
     }
 
     private Claims getClaims(String token) {
