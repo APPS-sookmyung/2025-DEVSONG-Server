@@ -21,6 +21,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostLikeRepository postLikeRepository;
     private final CommentRepository commentRepository;
+    private final PostApplyRepository postApplyRepository;
 
     //게시글 등록
     @Transactional
@@ -63,6 +64,7 @@ public class PostService {
                 .major(post.getUser().getMajor())
                 .studentId(post.getUser().getStudentId())
                 .createdAt(post.getCreatedAt())
+                .applyCount(postApplyRepository.countByPost(post))
                 .closed(post.isClosed())
                 .like(
                         postLikeRepository.countByPostId(post.getId())
