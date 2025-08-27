@@ -38,14 +38,11 @@ public class PostController {
 
     //전체 게시글 목록 조회
     @GetMapping
-    public List<PostListResponseDto> findAll() {
-        return postService.findAll();
-    }
-
-    //카테고리별 조회
-    @GetMapping("/category/{category}")
-    public List<PostListResponseDto> findByCategory(@PathVariable Category category) {
-        return postService.findByCategory(category);
+    public List<PostListResponseDto> findAll(@RequestParam(required = false) String category) {
+        if (category == null) {
+            return postService.findAll(); //전체조회
+        }
+        return postService.findByCategory(category); //카테고리별 조회
     }
 
 
