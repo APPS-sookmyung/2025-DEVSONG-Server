@@ -22,6 +22,7 @@ public class PostDetailResponseDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime createdAt;
     private final boolean closed; //마감여부
+    private final Long applyCount; //지원자 수
     private final Long like; //좋아요 수
     private final Long comment; //댓글 수
     private final List<CommentResponseDto> comments; //댓글 리스트
