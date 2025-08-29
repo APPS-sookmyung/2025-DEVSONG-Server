@@ -11,5 +11,4 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PostApplyResponseDto {
     private Long postApplyId;
-    private Long userId;
 }

@@ -11,7 +11,8 @@ import com.devsong.server.user.entity.User;
 import com.devsong.server.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,8 +28,12 @@ public class PostApplyService {
     @Transactional
     public PostApplyResponseDto applyPost(PostApplyRequestDto dto) {
 
-        User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        //jwt로 유저 정보 얻기
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = (Long) auth.getPrincipal();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾을 수 없습니다."));
 
         Post post = postRepository.findById(dto.getPostId())
                 .orElseThrow(() -> new RuntimeException("Post not found"));
@@ -42,7 +47,6 @@ public class PostApplyService {
 
         return PostApplyResponseDto.builder()
                 .postApplyId(saved.getId())
-                .userId(user.getId())
                 .build();
     }
 
