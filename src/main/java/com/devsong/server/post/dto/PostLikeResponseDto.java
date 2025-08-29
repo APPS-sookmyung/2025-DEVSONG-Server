@@ -11,5 +11,4 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PostLikeResponseDto {
     private Long postLikeId;
-    private Long userId;
 }

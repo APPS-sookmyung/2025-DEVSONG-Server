@@ -1,6 +1,7 @@
 package com.devsong.server.post.controller;
 
 import com.devsong.server.post.dto.*;
+import com.devsong.server.post.entity.Category;
 import com.devsong.server.post.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -37,9 +38,13 @@ public class PostController {
 
     //전체 게시글 목록 조회
     @GetMapping
-    public List<PostListResponseDto> findAll() {
-        return postService.findAll();
+    public List<PostListResponseDto> findAll(@RequestParam(required = false) String category) {
+        if (category == null) {
+            return postService.findAll(); //전체조회
+        }
+        return postService.findByCategory(category); //카테고리별 조회
     }
+
 
     //게시글 댓글 작성
     @PostMapping("/comment")
