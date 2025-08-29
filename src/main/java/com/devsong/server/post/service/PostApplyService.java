@@ -35,7 +35,7 @@ public class PostApplyService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Post post = postRepository.findById(dto.getPostId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
 
         if (post.isClosed()) {
             throw new IllegalStateException("Post closed");
