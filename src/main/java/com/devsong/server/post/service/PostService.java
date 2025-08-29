@@ -32,7 +32,7 @@ public class PostService {
         Long userId = (Long) auth.getPrincipal();
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         //RequestDto -> Entity 변환
         Post post = Post.builder()
@@ -52,7 +52,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public PostDetailResponseDto findPost(Long id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
         //Entity -> ResponseDto 변환
         return PostDetailResponseDto.builder()
@@ -139,15 +139,26 @@ public class PostService {
 
     //게시글 마감
     @Transactional
-    public void closePost(Long postId) {
+    public PostCloseResponseDto closePost(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
         if (post.isClosed()) {
-            throw new IllegalStateException("이미 마감된 게시물입니다.");
+            throw new IllegalStateException("Post closed");
         }
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = (Long) auth.getPrincipal();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
         post.setClosed(true);
+
+        return PostCloseResponseDto.builder()
+                .username(user.getUsername())
+                .closed(true)
+                .build();
     }
 }
 

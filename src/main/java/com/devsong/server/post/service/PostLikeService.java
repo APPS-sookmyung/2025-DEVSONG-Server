@@ -30,7 +30,7 @@ public class PostLikeService {
         Long userId = (Long) auth.getPrincipal();
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         boolean exists = postLikeRepository.existsByUserIdAndPostId(userId, dto.getPostId());
 

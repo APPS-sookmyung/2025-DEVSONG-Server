@@ -68,10 +68,10 @@ public class PostController {
     }
 
     //게시글 마감하기
-    @PatchMapping("/{id}/close")
-    public ResponseEntity<Void> closePost(@PathVariable Long id) {
-        postService.closePost(id);
-        return ResponseEntity.ok().build();
+    @PostMapping("/{id}/close")
+    public ResponseEntity<PostCloseResponseDto> closePost(@PathVariable Long id) {
+        PostCloseResponseDto response = postService.closePost(id);
+        return ResponseEntity.ok(response);
     }
 
 }

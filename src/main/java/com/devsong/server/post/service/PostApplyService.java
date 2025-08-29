@@ -26,13 +26,18 @@ public class PostApplyService {
 
         //jwt로 유저 정보 얻기
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Long userId = (Long) auth.getPrincipal();
+        Long principal = (Long) auth.getPrincipal();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾을 수 없습니다."));
+
+        User user = userRepository.findById(principal)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         Post post = postRepository.findById(dto.getPostId())
                 .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        if (post.isClosed()) {
+            throw new IllegalStateException("Post closed");
+        }
 
         PostApply postApply = PostApply.builder()
                 .user(user)
