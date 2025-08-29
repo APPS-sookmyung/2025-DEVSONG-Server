@@ -99,4 +99,17 @@ public class PostService {
         if (content == null) return "";
         return content.length() > limit ? content.substring(0, limit) + "..." : content;
     }
+
+    //게시글 마감
+    @Transactional
+    public void closePost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+
+        if (post.isClosed()) {
+            throw new IllegalStateException("이미 마감된 게시물입니다.");
+        }
+
+        post.setClosed(true);
+    }
 }
