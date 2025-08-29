@@ -4,5 +4,11 @@ import com.devsong.server.post.entity.Post;
 import com.devsong.server.post.entity.PostApply;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface PostApplyRepository extends JpaRepository<PostApply, Long> { ;
+import java.util.List;
+
+public interface PostApplyRepository extends JpaRepository<PostApply, Long> {
+
+    //지원자 목록 불러오기
+    List<PostApply> findByPostId(Long postId);
+
 }

@@ -3,6 +3,7 @@ package com.devsong.server.post.controller;
 import com.devsong.server.post.dto.*;
 import com.devsong.server.post.service.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,6 +61,16 @@ public class PostController {
     public ResponseEntity<PostLikeResponseDto> toggle(@RequestBody PostLikeRequestDto dto) {
         PostLikeResponseDto response = postLikeService.togglePostLike(dto);
         return ResponseEntity.ok(response);
+    }
+
+    // 지원자 목록 조회 (작성자만 가능)
+    @GetMapping("/{id}/applicantList")
+    public ResponseEntity<List<PostApplicantListResponseDto>> getApplicants(@PathVariable Long postId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = (Long) auth.getPrincipal();
+
+        List<PostApplicantListResponseDto> applicants = postApplyService.getApplicants(postId, userId);
+        return ResponseEntity.ok(applicants);
     }
 
 }
