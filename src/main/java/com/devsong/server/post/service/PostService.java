@@ -4,6 +4,7 @@ import com.devsong.server.post.dto.*;
 import com.devsong.server.post.entity.Category;
 import com.devsong.server.post.entity.Post;
 import com.devsong.server.user.entity.User;
+import com.devsong.server.post.entity.Comment;
 import com.devsong.server.post.repository.*;
 import com.devsong.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,13 @@ public class PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
 
+        List<Comment> comments = commentRepository.findByPostId(id);
+
+        List<CommentResponseDto> commentDtos = comments.stream()
+                .filter(c -> c.getParent() == null)
+                .map(c -> toDto(c, comments))
+                .toList();
+
         //Entity -> ResponseDto 변환
         return PostDetailResponseDto.builder()
                 .id(post.getId())
@@ -70,16 +78,7 @@ public class PostService {
                 .comment(
                         commentRepository.countByPostId(post.getId())
                 )
-                .comments(
-                        commentRepository.findByPostId(post.getId()).stream()
-                                .map(comment -> CommentResponseDto.builder()
-                                        .commentId(comment.getId())
-                                        .username(comment.getUser().getUsername())
-                                        .content(comment.getContent())
-                                        .createdAt(comment.getCreatedAt())
-                                        .build()
-                                ).toList()
-                )
+                .comments(commentDtos)
                 .build();
     }
 
@@ -132,5 +131,23 @@ public class PostService {
         if (content == null) return "";
         return content.length() > limit ? content.substring(0, limit) + "..." : content;
     }
+
+    private CommentResponseDto toDto(Comment comment, List<Comment> allComments) {
+        // 현재 댓글의 자식 찾기
+        List<CommentResponseDto> children = allComments.stream()
+                .filter(c -> c.getParent() != null && c.getParent().getId().equals(comment.getId()))
+                .map(c -> toDto(c, allComments)) // 재귀 호출
+                .toList();
+
+        return CommentResponseDto.builder()
+                .commentId(comment.getId())
+                .username(comment.getUser().getUsername())
+                .content(comment.getContent())
+                .createdAt(comment.getCreatedAt())
+                .parentId(comment.getParent() != null ? comment.getParent().getId() : null)
+                .children(children.isEmpty() ? null : children)
+                .build();
+    }
+
 }
 

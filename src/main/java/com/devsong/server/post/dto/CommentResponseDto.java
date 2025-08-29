@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
+import java.util.List;
 import java.time.LocalDateTime;
 
 @Getter
@@ -19,5 +19,6 @@ public class CommentResponseDto {
     private String content;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
-
+    private Long parentId;
+    private List<CommentResponseDto> children;
 }
