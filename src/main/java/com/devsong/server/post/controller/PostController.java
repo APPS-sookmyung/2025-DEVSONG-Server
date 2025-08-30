@@ -5,6 +5,8 @@ import com.devsong.server.post.entity.Category;
 import com.devsong.server.post.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -65,6 +67,16 @@ public class PostController {
     public ResponseEntity<PostLikeResponseDto> toggle(@RequestBody PostLikeRequestDto dto) {
         PostLikeResponseDto response = postLikeService.togglePostLike(dto);
         return ResponseEntity.ok(response);
+    }
+
+    //지원자 목록 조회
+    @GetMapping("/{id}/applicantlist")
+    public ResponseEntity<List<PostApplicantListResponseDto>> getApplicants(@PathVariable("id") Long postId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = (Long) auth.getPrincipal();
+
+        List<PostApplicantListResponseDto> applicants = postApplyService.getApplicants(postId, userId);
+        return ResponseEntity.ok(applicants);
     }
 
 }
