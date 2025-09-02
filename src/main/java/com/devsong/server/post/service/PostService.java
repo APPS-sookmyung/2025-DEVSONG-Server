@@ -4,6 +4,7 @@ import com.devsong.server.post.dto.*;
 import com.devsong.server.post.entity.Category;
 import com.devsong.server.post.entity.Post;
 import com.devsong.server.user.entity.User;
+import com.devsong.server.post.entity.Comment;
 import com.devsong.server.post.repository.*;
 import com.devsong.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +56,13 @@ public class PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
 
+        List<Comment> comments = commentRepository.findByPostId(id);
+
+        List<CommentResponseDto> commentDtos = comments.stream()
+                .filter(c -> c.getParent() == null)
+                .map(c -> toDto(c, comments))
+                .toList();
+
         //Entity -> ResponseDto 변환
         return PostDetailResponseDto.builder()
                 .id(post.getId())
@@ -73,16 +81,7 @@ public class PostService {
                 .comment(
                         commentRepository.countByPostId(post.getId())
                 )
-                .comments(
-                        commentRepository.findByPostId(post.getId()).stream()
-                                .map(comment -> CommentResponseDto.builder()
-                                        .commentId(comment.getId())
-                                        .username(comment.getUser().getUsername())
-                                        .content(comment.getContent())
-                                        .createdAt(comment.getCreatedAt())
-                                        .build()
-                                ).toList()
-                )
+                .comments(commentDtos)
                 .build();
     }
 
@@ -92,19 +91,19 @@ public class PostService {
     public List<PostListResponseDto> findAll() {
         return postRepository.findAllByOrderByIdDesc().stream()
                 .map(post -> PostListResponseDto.builder()
-                                .id(post.getId())
-                                .title(post.getTitle())
-                                .username(post.getUser().getUsername())
-                                .preview(preview(post.getContent(), 80))
-                                .createdAt(post.getCreatedAt())
-                                .closed(post.isClosed())
-                                .like(
-                                        postLikeRepository.countByPostId(post.getId())
-                                )
-                                .comment(
-                                        commentRepository.countByPostId(post.getId())
-                                )
-                                .build()
+                        .id(post.getId())
+                        .title(post.getTitle())
+                        .username(post.getUser().getUsername())
+                        .preview(preview(post.getContent(), 80))
+                        .createdAt(post.getCreatedAt())
+                        .closed(post.isClosed())
+                        .like(
+                                postLikeRepository.countByPostId(post.getId())
+                        )
+                        .comment(
+                                commentRepository.countByPostId(post.getId())
+                        )
+                        .build()
                 )
                 .toList();
     }
@@ -178,6 +177,24 @@ public class PostService {
                 .closed(true)
                 .build();
     }
+
+    private CommentResponseDto toDto(Comment comment, List<Comment> allComments) {
+        // 현재 댓글의 자식 찾기
+        List<CommentResponseDto> children = allComments.stream()
+                .filter(c -> c.getParent() != null && c.getParent().getId().equals(comment.getId()))
+                .map(c -> toDto(c, allComments)) // 재귀 호출
+                .toList();
+
+        return CommentResponseDto.builder()
+                .commentId(comment.getId())
+                .username(comment.getUser().getUsername())
+                .content(comment.getContent())
+                .createdAt(comment.getCreatedAt())
+                .parentId(comment.getParent() != null ? comment.getParent().getId() : null)
+                .children(children.isEmpty() ? null : children)
+                .build();
+    }
+
 }
 
 
