@@ -10,9 +10,11 @@ import com.devsong.server.user.entity.User;
 import com.devsong.server.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +32,7 @@ public class PostLikeService {
         Long userId = (Long) auth.getPrincipal();
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         boolean exists = postLikeRepository.existsByUserIdAndPostId(userId, dto.getPostId());
 
@@ -41,7 +43,7 @@ public class PostLikeService {
                     .build();
         } else {
             Post post = postRepository.findById(dto.getPostId())
-                    .orElseThrow(() -> new RuntimeException("Post not found"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
 
             PostLike postLike = PostLike.builder()
                     .user(user)
