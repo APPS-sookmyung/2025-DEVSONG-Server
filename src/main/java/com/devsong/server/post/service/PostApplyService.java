@@ -1,5 +1,6 @@
 package com.devsong.server.post.service;
 
+import com.devsong.server.post.dto.PostApplicantListResponseDto;
 import com.devsong.server.post.dto.PostApplyRequestDto;
 import com.devsong.server.post.dto.PostApplyResponseDto;
 import com.devsong.server.post.entity.Post;
@@ -15,6 +16,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +33,6 @@ public class PostApplyService {
         //jwt로 유저 정보 얻기
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Long userId = (Long) auth.getPrincipal();
-
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -51,5 +54,29 @@ public class PostApplyService {
         return PostApplyResponseDto.builder()
                 .postApplyId(saved.getId())
                 .build();
+    }
+
+    //지원자 목록 확인
+    @Transactional
+    public List<PostApplicantListResponseDto> getApplicants(Long postId, Long loginUserId) {
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
+
+        //글 작성자가 아닐 경우 권한 없음
+        if (!post.getUser().getId().equals(loginUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not Authorized");
+        }
+
+        List<PostApply> applies = postApplyRepository.findByPostId(postId);
+
+        return applies.stream()
+                .map(apply -> PostApplicantListResponseDto.builder()
+                        .userId(apply.getUser().getId())
+                        .username(apply.getUser().getUsername())
+                        .major(apply.getUser().getMajor())
+                        .studentId(apply.getUser().getStudentId())
+                        .build())
+                .toList();
     }
 }

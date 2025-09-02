@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import java.util.List;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -37,19 +38,47 @@ public class CommentService {
         Post post = postRepository.findById(dto.getPostId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
 
+        Comment parent = null;
+        if (dto.getParentId() != null) {
+            parent = commentRepository.findById(dto.getParentId())
+                    .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+
+            if (parent.getParent() != null) {
+                throw new RuntimeException("대댓글에는 더 이상 댓글을 달 수 없습니다.");
+            }
+        }
+
+
         Comment comment = Comment.builder()
                 .user(user)
                 .post(post)
+                .parent(parent)
                 .content(dto.getContent())
                 .build();
 
+        if (parent != null) {
+            parent.getChildren().add(comment);
+        }
+
         Comment saved = commentRepository.save(comment);
 
+        return toDto(saved);
+    }
+
+    private CommentResponseDto toDto(Comment comment) {
+        List<CommentResponseDto> childrenDtos = comment.getChildren() == null
+                ? List.of()  // null이면 빈 리스트 반환
+                : comment.getChildren().stream()
+                .map(this::toDto)
+                .toList();
+
         return CommentResponseDto.builder()
-                .commentId(saved.getId())
-                .username(user.getUsername())
-                .content(saved.getContent())
-                .createdAt(saved.getCreatedAt())
+                .commentId(comment.getId())
+                .username(comment.getUser().getUsername())
+                .content(comment.getContent())
+                .createdAt(comment.getCreatedAt())
+                .parentId(comment.getParent() != null ? comment.getParent().getId() : null)
                 .build();
+
     }
 }

@@ -137,6 +137,24 @@ public class PostService {
         return content.length() > limit ? content.substring(0, limit) + "..." : content;
     }
 
+    private CommentResponseDto toDto(Comment comment, List<Comment> allComments) {
+        // 현재 댓글의 자식 찾기
+        List<CommentResponseDto> children = allComments.stream()
+                .filter(c -> c.getParent() != null && c.getParent().getId().equals(comment.getId()))
+                .map(c -> toDto(c, allComments)) // 재귀 호출
+                .toList();
+
+        return CommentResponseDto.builder()
+                .commentId(comment.getId())
+                .username(comment.getUser().getUsername())
+                .content(comment.getContent())
+                .createdAt(comment.getCreatedAt())
+                .parentId(comment.getParent() != null ? comment.getParent().getId() : null)
+                .children(children.isEmpty() ? null : children)
+                .build();
+    }
+
+
     //게시글 마감
     @Transactional
     public PostCloseResponseDto closePost(Long postId) {
@@ -178,23 +196,5 @@ public class PostService {
                 .build();
     }
 
-    private CommentResponseDto toDto(Comment comment, List<Comment> allComments) {
-        // 현재 댓글의 자식 찾기
-        List<CommentResponseDto> children = allComments.stream()
-                .filter(c -> c.getParent() != null && c.getParent().getId().equals(comment.getId()))
-                .map(c -> toDto(c, allComments)) // 재귀 호출
-                .toList();
-
-        return CommentResponseDto.builder()
-                .commentId(comment.getId())
-                .username(comment.getUser().getUsername())
-                .content(comment.getContent())
-                .createdAt(comment.getCreatedAt())
-                .parentId(comment.getParent() != null ? comment.getParent().getId() : null)
-                .children(children.isEmpty() ? null : children)
-                .build();
-    }
-
 }
-
 

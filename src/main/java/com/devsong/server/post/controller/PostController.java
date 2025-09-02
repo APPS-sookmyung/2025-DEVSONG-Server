@@ -69,21 +69,24 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    //지원자 목록 조회
+    @GetMapping("/{id}/applicantlist")
+    public ResponseEntity<List<PostApplicantListResponseDto>> getApplicants(@PathVariable("id") Long postId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = (Long) auth.getPrincipal();
+
+        List<PostApplicantListResponseDto> applicants = postApplyService.getApplicants(postId, userId);
+        return ResponseEntity.ok(applicants);
+    }
+
     //게시글 마감하기
     @PostMapping("/{id}/close")
     public ResponseEntity<PostCloseResponseDto> closePost(@PathVariable Long id) {
         PostCloseResponseDto response = postService.closePost(id);
         return ResponseEntity.ok(response);
-
-        //지원자 목록 조회
-        @GetMapping("/{id}/applicantlist")
-        public ResponseEntity<List<PostApplicantListResponseDto>> getApplicants(@PathVariable("id") Long postId) {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            Long userId = (Long) auth.getPrincipal();
-
-            List<PostApplicantListResponseDto> applicants = postApplyService.getApplicants(postId, userId);
-            return ResponseEntity.ok(applicants);
-        }
-
     }
+
+}
+
+
 
