@@ -8,10 +8,12 @@ import com.devsong.server.post.entity.Comment;
 import com.devsong.server.post.repository.*;
 import com.devsong.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -33,8 +35,7 @@ public class PostService {
         Long userId = (Long) auth.getPrincipal();
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾을 수 없습니다."));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         //RequestDto -> Entity 변환
         Post post = Post.builder()
                 .title(requestDto.getTitle())
@@ -53,7 +54,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public PostDetailResponseDto findPost(Long id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
 
         List<Comment> comments = commentRepository.findByPostId(id);
 
@@ -151,6 +152,48 @@ public class PostService {
                 .createdAt(comment.getCreatedAt())
                 .parentId(comment.getParent() != null ? comment.getParent().getId() : null)
                 .children(children.isEmpty() ? null : children)
+                .build();
+    }
+
+
+    //게시글 마감
+    @Transactional
+    public PostCloseResponseDto closePost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+        if (post.isClosed()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Post already closed");
+        }
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getPrincipal() == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthenticated");
+        }
+
+        Object principal = auth.getPrincipal();
+        Long userId;
+
+        if (principal instanceof Long l) {
+            userId = l;
+        } else if (principal instanceof org.springframework.security.core.userdetails.UserDetails ud) {
+            userId = Long.parseLong(ud.getUsername());
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid principal");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (!post.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not authorized to close this post");
+        }
+
+        post.setClosed(true);
+
+        return PostCloseResponseDto.builder()
+                .username(user.getUsername())
+                .closed(true)
                 .build();
     }
 

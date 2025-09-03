@@ -30,6 +30,7 @@ public class Post {
     @Enumerated(EnumType.STRING)
     private Category category; //카테고리
 
+    @Setter
     private boolean closed; //마감여부
 
     private LocalDateTime createdAt; //작성시각
