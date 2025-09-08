@@ -12,6 +12,10 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class PostDetailResponseDto {
+    private boolean author; //내가 쓴 글인지
+    private boolean liked; //좋아요 여부
+    private boolean applied; //지원 여부
+
     private final Long id;
     private final String title;
     private final String username;
