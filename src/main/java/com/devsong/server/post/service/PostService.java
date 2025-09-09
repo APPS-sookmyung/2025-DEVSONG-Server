@@ -8,6 +8,7 @@ import com.devsong.server.post.entity.Comment;
 import com.devsong.server.post.repository.*;
 import com.devsong.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @Service
@@ -91,49 +93,39 @@ public class PostService {
 
     //전체 게시글 목록 조회
     @Transactional(readOnly = true)
-    public List<PostListResponseDto> findAll() {
-        return postRepository.findAllByOrderByIdDesc().stream()
-                .map(post -> PostListResponseDto.builder()
-                                .id(post.getId())
-                                .title(post.getTitle())
-                                .username(post.getUser().getUsername())
-                                .category(post.getCategory().toString())
-                                .preview(preview(post.getContent(), 80))
-                                .createdAt(post.getCreatedAt())
-                                .closed(post.isClosed())
-                                .like(
-                                        postLikeRepository.countByPostId(post.getId())
-                                )
-                                .comment(
-                                        commentRepository.countByPostId(post.getId())
-                                )
-                                .build()
-                )
-                .toList();
-    }
-
-    //카테고리별 게시글 목록 조회
-    @Transactional(readOnly = true)
-    public List<PostListResponseDto> findByCategory(String category) {
-        Category categoryEnum = Category.from(category);
-        return postRepository.findAllByCategoryOrderByIdDesc(categoryEnum)
-                .stream()
+    public Page<PostListResponseDto> findAll(Pageable pageable) {
+        return postRepository.findAll(pageable)
                 .map(post -> PostListResponseDto.builder()
                         .id(post.getId())
                         .title(post.getTitle())
                         .username(post.getUser().getUsername())
+                        .category(post.getCategory().toString())
                         .preview(preview(post.getContent(), 80))
                         .createdAt(post.getCreatedAt())
                         .closed(post.isClosed())
-                        .like(
-                                postLikeRepository.countByPostId(post.getId())
-                        )
-                        .comment(
-                                commentRepository.countByPostId(post.getId())
-                        )
+                        .like(postLikeRepository.countByPostId(post.getId()))
+                        .comment(commentRepository.countByPostId(post.getId()))
                         .build()
-                )
-                .toList();
+                );
+    }
+
+    //카테고리별 게시글 목록 조회
+    @Transactional(readOnly = true)
+    public Page<PostListResponseDto> findByCategory(String category, Pageable pageable) {
+        Category categoryEnum = Category.from(category);
+        return postRepository.findAllByCategory(categoryEnum, pageable)
+                .map(post -> PostListResponseDto.builder()
+                        .id(post.getId())
+                        .title(post.getTitle())
+                        .username(post.getUser().getUsername())
+                        .category(post.getCategory().toString())
+                        .preview(preview(post.getContent(), 80))
+                        .createdAt(post.getCreatedAt())
+                        .closed(post.isClosed())
+                        .like(postLikeRepository.countByPostId(post.getId()))
+                        .comment(commentRepository.countByPostId(post.getId()))
+                        .build()
+                );
     }
 
     private String preview(String content, int limit) {

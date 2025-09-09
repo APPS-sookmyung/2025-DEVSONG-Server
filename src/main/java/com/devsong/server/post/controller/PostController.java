@@ -4,10 +4,14 @@ import com.devsong.server.post.dto.*;
 import com.devsong.server.post.entity.Category;
 import com.devsong.server.post.service.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -41,13 +45,14 @@ public class PostController {
     }
 
 
-    //전체 게시글 목록 조회
+    //게시글 목록 조회
     @GetMapping
-    public List<PostListResponseDto> findAll(@RequestParam(required = false) String category) {
+    public Page<PostListResponseDto> findAll(@RequestParam(required = false) String category,
+                                             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC, size = 10) Pageable pageable) {
         if (category == null) {
-            return postService.findAll(); //전체조회
+            return postService.findAll(pageable); //전체조회
         }
-        return postService.findByCategory(category); //카테고리별 조회
+        return postService.findByCategory(category, pageable); //카테고리별 조회
     }
 
 
