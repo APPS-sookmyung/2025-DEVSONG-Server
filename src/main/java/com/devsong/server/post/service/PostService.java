@@ -52,11 +52,11 @@ public class PostService {
 
     //게시글 상세정보 조회 (없을 시 코멘트 출력)
     @Transactional(readOnly = true)
-    public PostDetailResponseDto findPost(Long id) {
-        Post post = postRepository.findById(id)
+    public PostDetailResponseDto findPost(Long postId, Long userId) {
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
 
-        List<Comment> comments = commentRepository.findByPostId(id);
+        List<Comment> comments = commentRepository.findByPostId(postId);
 
         List<CommentResponseDto> commentDtos = comments.stream()
                 .filter(c -> c.getParent() == null)
@@ -65,7 +65,10 @@ public class PostService {
 
         //Entity -> ResponseDto 변환
         return PostDetailResponseDto.builder()
-                .id(post.getId())
+                .author(post.getUser().getId().equals(userId))
+                .liked(postLikeRepository.existsByUserIdAndPostId(userId, postId))
+                .applied(postApplyRepository.existsByPostIdAndUserId(postId, userId))
+                .id(postId)
                 .title(post.getTitle())
                 .username(post.getUser().getUsername())
                 .content(post.getContent())
@@ -76,10 +79,10 @@ public class PostService {
                 .applyCount(postApplyRepository.countByPost(post))
                 .closed(post.isClosed())
                 .like(
-                        postLikeRepository.countByPostId(post.getId())
+                        postLikeRepository.countByPostId(postId)
                 )
                 .comment(
-                        commentRepository.countByPostId(post.getId())
+                        commentRepository.countByPostId(postId)
                 )
                 .comments(commentDtos)
                 .build();

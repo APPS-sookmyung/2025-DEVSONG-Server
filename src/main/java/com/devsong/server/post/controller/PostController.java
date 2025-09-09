@@ -31,9 +31,12 @@ public class PostController {
 
 
     //게시글 상세정보 조회
-    @GetMapping("/{id}")
-    public ResponseEntity<PostDetailResponseDto> getPost(@PathVariable Long id) {
-        PostDetailResponseDto responseDto = postService.findPost(id);
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostDetailResponseDto> getPost(@PathVariable Long postId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //jwt에서 유저 정보 가져오기
+        Long userId = (Long) auth.getPrincipal();
+
+        PostDetailResponseDto responseDto = postService.findPost(postId, userId);
         return ResponseEntity.ok(responseDto);
     }
 
