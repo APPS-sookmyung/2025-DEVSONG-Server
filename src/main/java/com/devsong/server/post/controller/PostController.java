@@ -89,6 +89,12 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    //현재 인기글 조회 (베스트 글 불러오기)
+    @GetMapping("/best")
+    public ResponseEntity<List<PostBestResponseDto>> getBestPosts() {
+        List<PostBestResponseDto> bestPosts = postService.findBestPosts();
+        return ResponseEntity.ok(bestPosts);
+    }
 }
 
 
