@@ -192,5 +192,19 @@ public class PostService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
+    public List<PostBestResponseDto> findBestPosts() {
+        return postRepository.findByLikeCountDesc(org.springframework.data.domain.PageRequest.of(0, 9)).stream()
+                .map(post -> PostBestResponseDto.builder()
+                        .postId(post.getId())
+                        .title(post.getTitle())
+                        .preview(preview(post.getContent(), 150))
+                        .category(post.getCategory())
+                        .closed(post.isClosed())
+                        .build()
+                )
+                .toList();
+    }
+
 }
 
