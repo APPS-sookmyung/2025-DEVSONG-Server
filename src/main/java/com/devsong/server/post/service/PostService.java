@@ -9,6 +9,7 @@ import com.devsong.server.post.repository.*;
 import com.devsong.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -93,39 +94,54 @@ public class PostService {
 
     //전체 게시글 목록 조회
     @Transactional(readOnly = true)
-    public Page<PostListResponseDto> findAll(Pageable pageable) {
-        return postRepository.findAll(pageable)
-                .map(post -> PostListResponseDto.builder()
-                        .id(post.getId())
-                        .title(post.getTitle())
-                        .username(post.getUser().getUsername())
-                        .category(post.getCategory().toString())
-                        .preview(preview(post.getContent(), 80))
-                        .createdAt(post.getCreatedAt())
-                        .closed(post.isClosed())
-                        .like(postLikeRepository.countByPostId(post.getId()))
-                        .comment(commentRepository.countByPostId(post.getId()))
-                        .build()
-                );
+    public Page<PostListResponseDto> findAll(Pageable pageable, String sortBy) {
+        Page<Post> posts;
+
+        if ("like".equalsIgnoreCase(sortBy)) {
+            Pageable noSortPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
+            posts = postRepository.findAllOrderByLikeCount(noSortPageable);
+        } else {
+            posts = postRepository.findAllByOrderByCreatedAtDesc(pageable);
+        }
+
+        return posts.map(post -> PostListResponseDto.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .username(post.getUser().getUsername())
+                .category(post.getCategory().toString())
+                .preview(preview(post.getContent(), 80))
+                .createdAt(post.getCreatedAt())
+                .closed(post.isClosed())
+                .like(postLikeRepository.countByPostId(post.getId()))
+                .comment(commentRepository.countByPostId(post.getId()))
+                .build()
+        );
     }
 
     //카테고리별 게시글 목록 조회
     @Transactional(readOnly = true)
-    public Page<PostListResponseDto> findByCategory(String category, Pageable pageable) {
+    public Page<PostListResponseDto> findByCategory(String category, Pageable pageable, String sortBy) {
         Category categoryEnum = Category.from(category);
-        return postRepository.findAllByCategory(categoryEnum, pageable)
-                .map(post -> PostListResponseDto.builder()
-                        .id(post.getId())
-                        .title(post.getTitle())
-                        .username(post.getUser().getUsername())
-                        .category(post.getCategory().toString())
-                        .preview(preview(post.getContent(), 80))
-                        .createdAt(post.getCreatedAt())
-                        .closed(post.isClosed())
-                        .like(postLikeRepository.countByPostId(post.getId()))
-                        .comment(commentRepository.countByPostId(post.getId()))
-                        .build()
-                );
+        Page<Post> posts;
+
+        if ("like".equalsIgnoreCase(sortBy)) {
+            Pageable noSortPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
+            posts = postRepository.findAllByCategoryOrderByLikeCount(categoryEnum, noSortPageable);
+        } else {
+            posts = postRepository.findAllByCategoryOrderByCreatedAtDesc(categoryEnum, pageable);
+        }
+        return posts.map(post -> PostListResponseDto.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .username(post.getUser().getUsername())
+                .category(post.getCategory().toString())
+                .preview(preview(post.getContent(), 80))
+                .createdAt(post.getCreatedAt())
+                .closed(post.isClosed())
+                .like(postLikeRepository.countByPostId(post.getId()))
+                .comment(commentRepository.countByPostId(post.getId()))
+                .build()
+        );
     }
 
     private String preview(String content, int limit) {

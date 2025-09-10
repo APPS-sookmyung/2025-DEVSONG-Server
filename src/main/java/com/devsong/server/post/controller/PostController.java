@@ -48,12 +48,14 @@ public class PostController {
     //게시글 목록 조회
     @GetMapping
     public Page<PostListResponseDto> findAll(@RequestParam(required = false) String category,
-                                             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC, size = 10) Pageable pageable) {
+                                             @RequestParam(defaultValue = "createdAt") String sortBy,
+                                             @PageableDefault(size = 10) Pageable pageable) {
         if (category == null) {
-            return postService.findAll(pageable); //전체조회
+            return postService.findAll(pageable, sortBy); //전체조회
         }
-        return postService.findByCategory(category, pageable); //카테고리별 조회
+        return postService.findByCategory(category, pageable, sortBy); //카테고리별 조회
     }
+
 
 
     //게시글 댓글 작성

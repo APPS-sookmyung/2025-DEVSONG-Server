@@ -40,4 +40,7 @@ public class Post {
         this.createdAt = LocalDateTime.now();
     }
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostLike> postLikes = new ArrayList<>(); //좋아요 리스트
+
 }
