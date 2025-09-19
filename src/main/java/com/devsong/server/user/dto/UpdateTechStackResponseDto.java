@@ -1,14 +1,10 @@
 package com.devsong.server.user.dto;
 
-import com.devsong.server.user.entity.TechStack;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
-
 @Getter
-@AllArgsConstructor
+@Builder
 public class UpdateTechStackResponseDto {
-    private Long userId;
-    private List<TechStack> techStack;
+    private String message;
 }

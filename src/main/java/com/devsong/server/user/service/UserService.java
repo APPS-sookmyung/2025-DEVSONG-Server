@@ -86,7 +86,10 @@ public class UserService {
     @Transactional
     public UpdateTechStackResponseDto updateTechStack(Long userId, List<TechStack> incoming) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Long loginUserId = (Long) auth.getPrincipal();
+
+        Long loginUserId = (auth.getPrincipal() instanceof Long)
+                ? (Long) auth.getPrincipal()
+                : Long.valueOf(auth.getName());
 
         if (!loginUserId.equals(userId)) {
             throw new AccessDeniedException("Not Authorized");
@@ -97,7 +100,14 @@ public class UserService {
 
         user.setTechStack(incoming == null ? Collections.emptyList() : incoming);
 
-        return new UpdateTechStackResponseDto(user.getId(), user.getTechStack());
+        return UpdateTechStackResponseDto.builder()
+                .message("Update Success")
+                .build();
+    }
+
+    public User findById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
 }
