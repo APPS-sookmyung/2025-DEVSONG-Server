@@ -12,4 +12,6 @@ public interface PostApplyRepository extends JpaRepository<PostApply, Long> {
     List<PostApply> findByPostId(Long postId);
 
     boolean existsByPostIdAndUserId(Long postId, Long userId);
+
+    List<PostApply> findByUserId(Long userId); //내가 지원한 글 조회
 }
