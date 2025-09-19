@@ -36,15 +36,18 @@ public class PostLikeService {
 
         boolean exists = postLikeRepository.existsByUserIdAndPostId(userId, dto.getPostId());
 
+        Post post = postRepository.findById(dto.getPostId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
+
         if (exists) { //이미 좋아요 누른 경우
             postLikeRepository.deleteByUserIdAndPostId(userId, dto.getPostId());
+
+            post.setLikeCount(post.getLikeCount() + 1);
+
             return PostLikeResponseDto.builder()
                     .postLikeId(null)
                     .build();
         } else { //좋아요 누르지 않은 경우
-            Post post = postRepository.findById(dto.getPostId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
-
             PostLike postLike = PostLike.builder()
                     .user(user)
                     .post(post)
