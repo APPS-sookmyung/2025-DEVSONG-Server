@@ -1,10 +1,7 @@
 package com.devsong.server.user.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -44,4 +41,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     @CollectionTable
     private List<TechStack> techStack; //기술스택
+
+    //기술스택 수정
+    public void setTechStack(List<TechStack> techStack) {
+        this.techStack = techStack;
+    }
+
 }

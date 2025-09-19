@@ -2,11 +2,20 @@ package com.devsong.server.user.service;
 
 import com.devsong.server.jwt.JwtTokenProvider;
 import com.devsong.server.user.dto.*;
+import com.devsong.server.user.entity.TechStack;
 import com.devsong.server.user.entity.User;
 import com.devsong.server.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import org.springframework.security.access.AccessDeniedException;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -73,4 +82,22 @@ public class UserService {
         boolean isExist = (userRepository.findByEmail(emailRequestDto.getEmail()) != null);
         return new EmailResponseDto(!isExist);
     }
+
+    @Transactional
+    public UpdateTechStackResponseDto updateTechStack(Long userId, List<TechStack> incoming) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long loginUserId = (Long) auth.getPrincipal();
+
+        if (!loginUserId.equals(userId)) {
+            throw new AccessDeniedException("Not Authorized");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        user.setTechStack(incoming == null ? Collections.emptyList() : incoming);
+
+        return new UpdateTechStackResponseDto(user.getId(), user.getTechStack());
+    }
+
 }
