@@ -28,6 +28,7 @@ public class UserService {
                 .major(signupRequestDto.getMajor())
                 .bojId(signupRequestDto.getBojId())
                 .githubId(signupRequestDto.getGithubId())
+                .techStack(signupRequestDto.getTechStack())
                 .build(); //변환 완료
 
         //UserRepository.save DB에 저장

@@ -1,6 +1,9 @@
 package com.devsong.server.user.dto;
 
+import com.devsong.server.user.entity.TechStack;
 import lombok.Getter;
+
+import java.util.List;
 
 @Getter
 public class SignupRequestDto {
@@ -18,4 +21,6 @@ public class SignupRequestDto {
     private String bojId; //백준 아이디
 
     private String githubId; //깃허브 아이디
+
+    private List<TechStack> techStack; //기술스택
 }
