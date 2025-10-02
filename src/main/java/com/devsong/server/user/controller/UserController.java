@@ -4,6 +4,8 @@ import com.devsong.server.user.dto.*;
 import com.devsong.server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,5 +27,25 @@ public class UserController {
     @PostMapping("/check-email") //이메일 중복확인
     public EmailResponseDto checkEmail(@RequestBody EmailRequestDto emailRequestDto) {
         return userService.checkEmail(emailRequestDto);
+    }
+
+    @GetMapping("/me/posts")
+    public List<MyPostDto> getMyPosts(@AuthenticationPrincipal Long userId) {
+        return userService.getMyPosts(userId);
+    }
+
+    @GetMapping("/me/comments")
+    public List<MyPostDto> getMyCommentedPosts(@AuthenticationPrincipal Long userId) {
+        return userService.getMyCommentedPosts(userId);
+    }
+
+    @GetMapping("/me/likes")
+    public List<MyPostDto> getMyLikedPosts(@AuthenticationPrincipal Long userId) {
+        return userService.getMyLikedPosts(userId);
+    }
+
+    @GetMapping("/me/applies")
+    public List<MyPostDto> getMyAppliedPosts(@AuthenticationPrincipal Long userId) {
+        return userService.getMyAppliedPosts(userId);
     }
 }
