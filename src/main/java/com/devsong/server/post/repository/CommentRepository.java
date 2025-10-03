@@ -13,4 +13,5 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     Long countByPostId(Long postId);
     List<Comment> findByPostId(Long postId);
+    List<Comment> findByUserIdOrderByIdDesc(Long userId); // 내가 댓글 단 글 조회
 }

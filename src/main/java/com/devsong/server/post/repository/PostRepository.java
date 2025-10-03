@@ -15,4 +15,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "GROUP BY p.id " +
             "ORDER BY COUNT(pl.id) DESC")
     List<Post> findByLikeCountDesc(Pageable pageable); //좋아요 상위 9개 게시글 조회
+    List<Post> findByUserIdOrderByIdDesc(Long userId); //내가 쓴 글 조회
 }
