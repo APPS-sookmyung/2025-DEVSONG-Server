@@ -4,7 +4,6 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-application.properties
 
 ### STS ###
 .apt_generated
@@ -36,3 +35,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+!Dockerfile
+!docker-compose.yml
+!gradlew
+!gradlew.bat
+!.dockerignore
