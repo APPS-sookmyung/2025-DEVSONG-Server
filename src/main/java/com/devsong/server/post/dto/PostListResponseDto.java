@@ -23,5 +23,3 @@ public class PostListResponseDto {
     private final Long comment;
 
 }
-
-

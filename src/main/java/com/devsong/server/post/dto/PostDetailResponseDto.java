@@ -32,4 +32,3 @@ public class PostDetailResponseDto {
     private final List<CommentResponseDto> comments; //댓글 리스트
 
 }
-
