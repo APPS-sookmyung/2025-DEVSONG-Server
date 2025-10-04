@@ -117,13 +117,14 @@ public class PostService {
     @Transactional(readOnly = true)
     public List<PostListResponseDto> findByCategory(String category) {
         Category categoryEnum = Category.from(category);
+        String categoryName = categoryEnum.toString();
         return postRepository.findAllByCategoryOrderByIdDesc(categoryEnum)
                 .stream()
                 .map(post -> PostListResponseDto.builder()
                         .id(post.getId())
                         .title(post.getTitle())
                         .username(post.getUser().getUsername())
-                        .category(category)
+                        .category(categoryName)
                         .preview(preview(post.getContent(), 80))
                         .createdAt(post.getCreatedAt())
                         .closed(post.isClosed())
