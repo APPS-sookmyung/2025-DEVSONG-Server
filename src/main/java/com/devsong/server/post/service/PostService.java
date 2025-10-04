@@ -123,6 +123,7 @@ public class PostService {
                         .id(post.getId())
                         .title(post.getTitle())
                         .username(post.getUser().getUsername())
+                        .category(category)
                         .preview(preview(post.getContent(), 80))
                         .createdAt(post.getCreatedAt())
                         .closed(post.isClosed())
