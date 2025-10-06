@@ -46,6 +46,7 @@ public class PostService {
                 .category(requestDto.getCategory())
                 .closed(false) //마감여부 : dafualt 값을 false로
                 .user(user)
+                .likeCount(0L)
                 .build();
 
         postRepository.save(post);
@@ -81,8 +82,8 @@ public class PostService {
                 .createdAt(post.getCreatedAt())
                 .applyCount(postApplyRepository.countByPost(post))
                 .closed(post.isClosed())
-                .like(
-                        postLikeRepository.countByPostId(postId)
+                .likeCount(
+                        post.getLikeCount()
                 )
                 .comment(
                         commentRepository.countByPostId(postId)
@@ -112,7 +113,7 @@ public class PostService {
                 .preview(preview(post.getContent(), 80))
                 .createdAt(post.getCreatedAt())
                 .closed(post.isClosed())
-                .like(postLikeRepository.countByPostId(post.getId()))
+                .likeCount(postLikeRepository.countByPostId(post.getId()))
                 .comment(commentRepository.countByPostId(post.getId()))
                 .build()
         );
@@ -138,7 +139,7 @@ public class PostService {
                 .preview(preview(post.getContent(), 80))
                 .createdAt(post.getCreatedAt())
                 .closed(post.isClosed())
-                .like(postLikeRepository.countByPostId(post.getId()))
+                .likeCount(postLikeRepository.countByPostId(post.getId()))
                 .comment(commentRepository.countByPostId(post.getId()))
                 .build()
         );
