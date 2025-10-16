@@ -47,16 +47,13 @@ public class PostController {
 
     //게시글 목록 조회
     @GetMapping
-    public Page<PostListResponseDto> findAll(@RequestParam(required = false) String category,
-                                             @RequestParam(defaultValue = "createdAt") String sortBy,
-                                             @PageableDefault(size = 10) Pageable pageable) {
-        if (category == null) {
-            return postService.findAll(pageable, sortBy); //전체조회
-        }
-        return postService.findByCategory(category, pageable, sortBy); //카테고리별 조회
+    public ResponseEntity<PostPageResponseDto> findAll(@RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "0") int page // 페이지 번호, 기본값 0
+    ) {
+        PostPageResponseDto response = postService.findPosts(category, sortBy, page);
+        return ResponseEntity.ok(response);
     }
-
-
 
     //게시글 댓글 작성
     @PostMapping("/comment")

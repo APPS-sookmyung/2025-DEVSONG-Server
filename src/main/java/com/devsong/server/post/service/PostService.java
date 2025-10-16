@@ -92,57 +92,48 @@ public class PostService {
                 .build();
     }
 
-
-    //전체 게시글 목록 조회
+    //게시글 목록 조회
     @Transactional(readOnly = true)
-    public Page<PostListResponseDto> findAll(Pageable pageable, String sortBy) {
-        Page<Post> posts;
+    public PostPageResponseDto findPosts(String category, String sortBy, int page) {
+        Pageable pageable = PageRequest.of(page, 10); // 한 페이지당 10개 고정
 
-        if ("like".equalsIgnoreCase(sortBy)) {
-            Pageable noSortPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
-            posts = postRepository.findAllOrderByLikeCount(noSortPageable);
+        Page<Post> posts;
+        boolean sortByLike = "like".equalsIgnoreCase(sortBy);
+
+        if (category == null || category.isEmpty()) {
+            // 전체 게시글 조회
+            posts = sortByLike
+                    ? postRepository.findAllByOrderByLikeCountDesc(pageable)
+                    : postRepository.findAllByOrderByCreatedAtDesc(pageable);
         } else {
-            posts = postRepository.findAllByOrderByCreatedAtDesc(pageable);
+            // 카테고리별 게시글 조회
+            Category categoryEnum = Category.from(category);
+            posts = sortByLike
+                    ? postRepository.findAllByCategoryOrderByLikeCountDesc(categoryEnum, pageable)
+                    : postRepository.findAllByCategoryOrderByCreatedAtDesc(categoryEnum, pageable);
         }
 
-        return posts.map(post -> PostListResponseDto.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .username(post.getUser().getUsername())
-                .category(post.getCategory().toString())
-                .preview(preview(post.getContent(), 80))
-                .createdAt(post.getCreatedAt())
-                .closed(post.isClosed())
-                .likeCount(postLikeRepository.countByPostId(post.getId()))
-                .comment(commentRepository.countByPostId(post.getId()))
-                .build()
-        );
-    }
+        // 게시글 DTO로 변환
+        List<PostListResponseDto> postDtos = posts.getContent().stream()
+                .map(post -> PostListResponseDto.builder()
+                        .id(post.getId())
+                        .title(post.getTitle())
+                        .username(post.getUser().getUsername())
+                        .category(post.getCategory().toString())
+                        .preview(preview(post.getContent(), 80))
+                        .createdAt(post.getCreatedAt())
+                        .closed(post.isClosed())
+                        .likeCount(post.getLikeCount())
+                        .comment(commentRepository.countByPostId(post.getId()))
+                        .build())
+                .toList();
 
-    //카테고리별 게시글 목록 조회
-    @Transactional(readOnly = true)
-    public Page<PostListResponseDto> findByCategory(String category, Pageable pageable, String sortBy) {
-        Category categoryEnum = Category.from(category);
-        Page<Post> posts;
-
-        if ("like".equalsIgnoreCase(sortBy)) {
-            Pageable noSortPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
-            posts = postRepository.findAllByCategoryOrderByLikeCount(categoryEnum, noSortPageable);
-        } else {
-            posts = postRepository.findAllByCategoryOrderByCreatedAtDesc(categoryEnum, pageable);
-        }
-        return posts.map(post -> PostListResponseDto.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .username(post.getUser().getUsername())
-                .category(post.getCategory().toString())
-                .preview(preview(post.getContent(), 80))
-                .createdAt(post.getCreatedAt())
-                .closed(post.isClosed())
-                .likeCount(postLikeRepository.countByPostId(post.getId()))
-                .comment(commentRepository.countByPostId(post.getId()))
-                .build()
-        );
+        // DTO로 반환
+        return PostPageResponseDto.builder()
+                .posts(postDtos)
+                .totalPages(posts.getTotalPages())
+                .currentPage(posts.getNumber())
+                .build();
     }
 
     private String preview(String content, int limit) {
@@ -211,7 +202,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public List<PostBestResponseDto> findBestPosts() {
-        return postRepository.findByLikeCountDesc(org.springframework.data.domain.PageRequest.of(0, 9)).stream()
+        return postRepository.findAllByOrderByLikeCountDesc(PageRequest.of(0, 9))
                 .map(post -> PostBestResponseDto.builder()
                         .postId(post.getId())
                         .title(post.getTitle())
