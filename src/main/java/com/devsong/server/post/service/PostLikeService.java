@@ -42,7 +42,7 @@ public class PostLikeService {
         if (exists) { //이미 좋아요 누른 경우
             postLikeRepository.deleteByUserIdAndPostId(userId, dto.getPostId());
 
-            post.setLikeCount(post.getLikeCount() + 1);
+            post.setLikeCount(post.getLikeCount() - 1);
 
             return PostLikeResponseDto.builder()
                     .postLikeId(null)
