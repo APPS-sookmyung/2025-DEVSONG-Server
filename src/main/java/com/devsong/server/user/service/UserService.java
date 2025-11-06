@@ -87,6 +87,10 @@ public class UserService {
     public UpdateTechStackResponseDto updateTechStack(Long userId, List<TechStack> incoming) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
+        if (auth == null || auth.getPrincipal() == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthenticated");
+        }
+
         Long loginUserId = (auth.getPrincipal() instanceof Long)
                 ? (Long) auth.getPrincipal()
                 : Long.valueOf(auth.getName());

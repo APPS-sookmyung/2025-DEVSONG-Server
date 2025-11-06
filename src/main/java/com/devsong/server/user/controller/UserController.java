@@ -4,9 +4,10 @@ import com.devsong.server.user.dto.*;
 import com.devsong.server.user.entity.User;
 import com.devsong.server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,13 +36,14 @@ public class UserController {
         return userService.checkEmail(emailRequestDto);
     }
 
-    @PatchMapping("/{userId}/techstack")
+    @PostMapping("/techstack")
     public ResponseEntity<UpdateTechStackResponseDto> updateTechStack(
-            @PathVariable Long userId,
             @RequestBody UpdateTechStackRequestDto dto
     ) {
-        UpdateTechStackResponseDto response =
-                userService.updateTechStack(userId, dto.getTechStack());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = (Long) auth.getPrincipal();
+
+        UpdateTechStackResponseDto response = userService.updateTechStack(userId, dto.getTechStack());
         return ResponseEntity.ok(response);
     }
 
