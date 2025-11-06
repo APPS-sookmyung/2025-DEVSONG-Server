@@ -19,7 +19,7 @@ public class PostListResponseDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime createdAt;
     private final boolean closed;
-    private final Long like;
+    private final Long likeCount;
     private final Long comment;
 
 }

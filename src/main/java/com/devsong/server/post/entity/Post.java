@@ -35,9 +35,15 @@ public class Post {
 
     private LocalDateTime createdAt; //작성시각
 
+    @Setter
+    private Long likeCount; //좋아요 수
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostLike> postLikes = new ArrayList<>(); //좋아요 리스트
 
 }

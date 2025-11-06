@@ -11,6 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import com.devsong.server.post.entity.*;
+import com.devsong.server.post.repository.*;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.web.server.ResponseStatusException;
 
 import org.springframework.security.access.AccessDeniedException;
@@ -25,6 +29,11 @@ public class UserService {
     //DI
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final PostLikeRepository postLikeRepository;
+    private final PostApplyRepository postApplyRepository;
 
     // 회원가입
     public SignupResponseDto signup(SignupRequestDto signupRequestDto) {
@@ -114,4 +123,82 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
+
+    private String preview(String content, int limit) {
+        if (content == null) return "";
+        return content.length() > limit ? content.substring(0, limit) + "..." : content;
+    }
+
+    // 내가 쓴 글
+    public List<MyPostDto> getMyPosts(Long userId) {
+        return postRepository.findByUserIdOrderByIdDesc(userId).stream()
+                .map(post -> MyPostDto.builder()
+                        .postId(post.getId())
+                        .title(post.getTitle())
+                        .preview(preview(post.getContent(), 35))
+                        .category(post.getCategory())
+                        .username(post.getUser().getUsername())
+                        .createdAt(post.getCreatedAt())
+                        .closed(post.isClosed())
+                        .like(postLikeRepository.countByPostId(post.getId()))
+                        .comment(commentRepository.countByPostId(post.getId()))
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    // 내가 댓글 단 글
+    public List<MyPostDto> getMyCommentedPosts(Long userId) {
+        return commentRepository.findByUserIdOrderByIdDesc(userId).stream()
+                .map(comment -> {
+                    var post = comment.getPost();
+                    return MyPostDto.builder()
+                            .postId(post.getId())
+                            .title(post.getTitle())
+                            .preview(preview(post.getContent(), 35))
+                            .category(post.getCategory())
+                            .username(post.getUser().getUsername())
+                            .createdAt(post.getCreatedAt())
+                            .closed(post.isClosed())
+                            .like(postLikeRepository.countByPostId(post.getId()))
+                            .comment(commentRepository.countByPostId(post.getId()))
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    // 내가 좋아요한 글
+    public List<MyPostDto> getMyLikedPosts(Long userId) {
+        return postLikeRepository.findByUserId(userId).stream()
+                .map(PostLike::getPost)
+                .map(post -> MyPostDto.builder()
+                        .postId(post.getId())
+                        .title(post.getTitle())
+                        .preview(preview(post.getContent(), 35))
+                        .category(post.getCategory())
+                        .username(post.getUser().getUsername())
+                        .createdAt(post.getCreatedAt())
+                        .closed(post.isClosed())
+                        .like(postLikeRepository.countByPostId(post.getId()))
+                        .comment(commentRepository.countByPostId(post.getId()))
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    // 내가 지원한 글
+    public List<MyPostDto> getMyAppliedPosts(Long userId) {
+        return postApplyRepository.findByUserId(userId).stream()
+                .map(PostApply::getPost)
+                .map(post -> MyPostDto.builder()
+                        .postId(post.getId())
+                        .title(post.getTitle())
+                        .preview(preview(post.getContent(), 35))
+                        .category(post.getCategory())
+                        .username(post.getUser().getUsername())
+                        .createdAt(post.getCreatedAt())
+                        .closed(post.isClosed())
+                        .like(postLikeRepository.countByPostId(post.getId()))
+                        .comment(commentRepository.countByPostId(post.getId()))
+                        .build())
+                .collect(Collectors.toList());
+    }
 }
