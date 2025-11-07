@@ -3,20 +3,14 @@ package com.devsong.server.user.controller;
 import com.devsong.server.user.dto.*;
 import com.devsong.server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-<<<<<<< HEAD
-=======
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
->>>>>>> develop
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-<<<<<<< HEAD
-=======
 
->>>>>>> develop
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
@@ -39,8 +33,6 @@ public class UserController {
         return userService.checkEmail(emailRequestDto);
     }
 
-<<<<<<< HEAD
-=======
     @PostMapping("/me/techstack")
     public ResponseEntity<UpdateTechStackResponseDto> updateTechStack(
             @RequestBody UpdateTechStackRequestDto dto
@@ -53,7 +45,6 @@ public class UserController {
     }
 
 
->>>>>>> develop
     @GetMapping("/me/posts")
     public List<MyPostDto> getMyPosts(@AuthenticationPrincipal Long userId) {
         return userService.getMyPosts(userId);
