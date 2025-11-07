@@ -10,6 +10,10 @@ import com.devsong.server.post.entity.*;
 import com.devsong.server.post.repository.*;
 import java.util.List;
 import java.util.stream.Collectors;
+<<<<<<< HEAD
+=======
+import org.springframework.web.server.ResponseStatusException;
+>>>>>>> develop
 
 import java.util.UUID;
 
@@ -82,6 +86,41 @@ public class UserService {
         return new EmailResponseDto(!isExist);
     }
 
+<<<<<<< HEAD
+=======
+    @Transactional
+    public UpdateTechStackResponseDto updateTechStack(Long userId, List<TechStack> incoming) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || auth.getPrincipal() == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthenticated");
+        }
+
+        Long loginUserId = (auth.getPrincipal() instanceof Long)
+                ? (Long) auth.getPrincipal()
+                : Long.valueOf(auth.getName());
+
+        if (!loginUserId.equals(userId)) {
+            throw new AccessDeniedException("Not Authorized");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        user.setTechStack(incoming == null ? Collections.emptyList() : incoming);
+
+        return UpdateTechStackResponseDto.builder()
+                .message("Update Success")
+                .build();
+    }
+
+    public User findById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+
+>>>>>>> develop
     private String preview(String content, int limit) {
         if (content == null) return "";
         return content.length() > limit ? content.substring(0, limit) + "..." : content;

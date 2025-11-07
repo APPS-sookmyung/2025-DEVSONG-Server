@@ -30,6 +30,9 @@ public class PostLikeService {
         //jwt로 유저 정보 얻기
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Long userId = (Long) auth.getPrincipal();
+        if (auth == null || auth.getPrincipal() == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthenticated");
+        }
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -42,7 +45,7 @@ public class PostLikeService {
         if (exists) { //이미 좋아요 누른 경우
             postLikeRepository.deleteByUserIdAndPostId(userId, dto.getPostId());
 
-            post.setLikeCount(post.getLikeCount() + 1);
+            post.setLikeCount(post.getLikeCount() - 1);
 
             return PostLikeResponseDto.builder()
                     .postLikeId(null)
