@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -37,5 +39,15 @@ public class User {
 
     @Column(nullable = true)
     private String githubId; //깃허브 아이디
+
+    @ElementCollection
+    @Enumerated(EnumType.STRING)
+    @CollectionTable
+    private List<TechStack> techStack; //기술스택
+
+    //기술스택 수정
+    public void setTechStack(List<TechStack> techStack) {
+        this.techStack = techStack;
+    }
 
 }

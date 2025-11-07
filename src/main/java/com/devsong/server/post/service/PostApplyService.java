@@ -32,6 +32,10 @@ public class PostApplyService {
 
         //jwt로 유저 정보 얻기
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getPrincipal() == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthenticated");
+        }
+
         Long userId = (Long) auth.getPrincipal();
 
         User user = userRepository.findById(userId)

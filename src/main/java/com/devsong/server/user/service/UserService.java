@@ -2,15 +2,24 @@ package com.devsong.server.user.service;
 
 import com.devsong.server.jwt.JwtTokenProvider;
 import com.devsong.server.user.dto.*;
+import com.devsong.server.user.entity.TechStack;
 import com.devsong.server.user.entity.User;
 import com.devsong.server.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.devsong.server.post.entity.*;
 import com.devsong.server.post.repository.*;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.web.server.ResponseStatusException;
 
+import org.springframework.security.access.AccessDeniedException;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -37,6 +46,7 @@ public class UserService {
                 .major(signupRequestDto.getMajor())
                 .bojId(signupRequestDto.getBojId())
                 .githubId(signupRequestDto.getGithubId())
+                .techStack(signupRequestDto.getTechStack())
                 .build(); //변환 완료
 
         //UserRepository.save DB에 저장
@@ -81,6 +91,38 @@ public class UserService {
         boolean isExist = (userRepository.findByEmail(emailRequestDto.getEmail()) != null);
         return new EmailResponseDto(!isExist);
     }
+
+    @Transactional
+    public UpdateTechStackResponseDto updateTechStack(Long userId, List<TechStack> incoming) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || auth.getPrincipal() == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthenticated");
+        }
+
+        Long loginUserId = (auth.getPrincipal() instanceof Long)
+                ? (Long) auth.getPrincipal()
+                : Long.valueOf(auth.getName());
+
+        if (!loginUserId.equals(userId)) {
+            throw new AccessDeniedException("Not Authorized");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        user.setTechStack(incoming == null ? Collections.emptyList() : incoming);
+
+        return UpdateTechStackResponseDto.builder()
+                .message("Update Success")
+                .build();
+    }
+
+    public User findById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
 
     private String preview(String content, int limit) {
         if (content == null) return "";
