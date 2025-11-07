@@ -2,19 +2,24 @@ package com.devsong.server.user.service;
 
 import com.devsong.server.jwt.JwtTokenProvider;
 import com.devsong.server.user.dto.*;
+import com.devsong.server.user.entity.TechStack;
 import com.devsong.server.user.entity.User;
 import com.devsong.server.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.devsong.server.post.entity.*;
 import com.devsong.server.post.repository.*;
 import java.util.List;
 import java.util.stream.Collectors;
-<<<<<<< HEAD
-=======
 import org.springframework.web.server.ResponseStatusException;
->>>>>>> develop
 
+import org.springframework.security.access.AccessDeniedException;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -41,6 +46,7 @@ public class UserService {
                 .major(signupRequestDto.getMajor())
                 .bojId(signupRequestDto.getBojId())
                 .githubId(signupRequestDto.getGithubId())
+                .techStack(signupRequestDto.getTechStack())
                 .build(); //변환 완료
 
         //UserRepository.save DB에 저장
@@ -86,8 +92,6 @@ public class UserService {
         return new EmailResponseDto(!isExist);
     }
 
-<<<<<<< HEAD
-=======
     @Transactional
     public UpdateTechStackResponseDto updateTechStack(Long userId, List<TechStack> incoming) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -120,7 +124,6 @@ public class UserService {
     }
 
 
->>>>>>> develop
     private String preview(String content, int limit) {
         if (content == null) return "";
         return content.length() > limit ? content.substring(0, limit) + "..." : content;
