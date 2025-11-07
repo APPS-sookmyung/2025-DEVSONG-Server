@@ -217,5 +217,18 @@ public class PostService {
                 .toList();
     }
 
+    @Transactional
+    public void updatePost(PostUpdateRequestDto dto, Long userId) {
+
+        Post post = postRepository.findById(dto.getPostId())
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+        if (!post.getUser().getId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not authorized to update this post");
+            }
+
+        if (dto.getTitle() != null) post.setTitle(dto.getTitle());
+        if (dto.getContent() != null) post.setContent(dto.getContent());
+    }
 }
 
