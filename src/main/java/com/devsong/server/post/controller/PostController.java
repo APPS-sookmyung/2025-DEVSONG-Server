@@ -106,7 +106,7 @@ public class PostController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Long userId = (Long) auth.getPrincipal();
 
-        postService.updatePost(dto);
+        postService.updatePost(dto, userId);
         PostDetailResponseDto response = postService.findPost(dto.getPostId(), userId);
 
         return ResponseEntity.ok(response);
