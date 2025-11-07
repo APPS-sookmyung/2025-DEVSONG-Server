@@ -99,6 +99,18 @@ public class PostController {
         List<PostBestResponseDto> bestPosts = postService.findBestPosts();
         return ResponseEntity.ok(bestPosts);
     }
+
+    //게시글 수정
+    @PostMapping("/update")
+    public ResponseEntity<PostDetailResponseDto> updatePost(@RequestBody PostUpdateRequestDto dto) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = (Long) auth.getPrincipal();
+
+        postService.updatePost(dto);
+        PostDetailResponseDto response = postService.findPost(dto.getPostId(), userId);
+
+        return ResponseEntity.ok(response);
+    }
 }
 
 

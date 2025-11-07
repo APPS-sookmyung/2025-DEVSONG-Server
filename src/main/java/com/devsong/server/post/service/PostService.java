@@ -217,5 +217,14 @@ public class PostService {
                 .toList();
     }
 
+    @Transactional
+    public void updatePost(PostUpdateRequestDto dto) {
+
+        Post post = postRepository.findById(dto.getPostId())
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+        if (dto.getTitle() != null) post.setTitle(dto.getTitle());
+        if (dto.getContent() != null) post.setContent(dto.getContent());
+    }
 }
 
