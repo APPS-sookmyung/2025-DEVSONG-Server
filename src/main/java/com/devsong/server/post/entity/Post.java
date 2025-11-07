@@ -22,9 +22,11 @@ public class Post {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user; //유저
 
+    @Setter
     private String title; //제목
 
     @Column(columnDefinition = "TEXT", nullable = false)
+    @Setter
     private String content; //내용
 
     @Enumerated(EnumType.STRING)
