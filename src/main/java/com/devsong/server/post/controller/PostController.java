@@ -47,13 +47,16 @@ public class PostController {
 
     //게시글 목록 조회
     @GetMapping
-    public ResponseEntity<PostPageResponseDto> findAll(@RequestParam(required = false) String category,
+    public ResponseEntity<PostPageResponseDto> findAll(
+            @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "0") int page // 페이지 번호, 기본값 0
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) Boolean closed
     ) {
-        PostPageResponseDto response = postService.findPosts(category, sortBy, page);
+        PostPageResponseDto response = postService.findPosts(category, sortBy, page, closed); // 카테고리, 최신순인지 좋아요순인지, 몇 페이지인지, 모집마감 여부
         return ResponseEntity.ok(response);
     }
+
 
     //게시글 댓글 작성
     @PostMapping("/comment")

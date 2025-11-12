@@ -1,0 +1,11 @@
+.git
+.gitignore
+.gradle
+build
+*.iml
+.idea
+.vscode
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
