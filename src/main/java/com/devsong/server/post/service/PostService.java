@@ -22,7 +22,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PostService {
+public class PostService{
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostLikeRepository postLikeRepository;
@@ -55,6 +55,7 @@ public class PostService {
         postRepository.save(post);
         return new PostCreateResponseDto(post.getId());
     }
+
 
 
     //게시글 상세정보 조회 (없을 시 코멘트 출력)
@@ -218,4 +219,3 @@ public class PostService {
     }
 
 }
-
