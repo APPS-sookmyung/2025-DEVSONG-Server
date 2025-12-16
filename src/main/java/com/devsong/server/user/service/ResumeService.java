@@ -23,11 +23,11 @@ public class ResumeService {
     private Long getLoginUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !auth.isAuthenticated()) {
+        if (auth == null || auth.getPrincipal() == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthenticated");
         }
 
-        return Long.valueOf(auth.getName());
+        return (Long) auth.getPrincipal();
     }
 
     //이력서 조회

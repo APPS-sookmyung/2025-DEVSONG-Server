@@ -26,7 +26,7 @@ public class Resume {
     private String profileImage; //프로필사진
 
     @Builder.Default
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "resume_interests", joinColumns = @JoinColumn(name = "resume_id"))
     private List<TechStack> interests = new ArrayList<>(); //관심분야

@@ -61,9 +61,6 @@ public class UserService {
 
         resumeRepository.save(resumeEntity);
 
-        //UserRepository.save DB에 저장
-        userRepository.save(userEntity);
-
         //UserRepository.FindByEmail로 id 찾기
         Long Id = userRepository.findByEmail(userEntity.getEmail()).getId();
 

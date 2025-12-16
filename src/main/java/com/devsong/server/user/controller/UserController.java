@@ -1,6 +1,5 @@
 package com.devsong.server.user.controller;
 
-import com.devsong.server.post.dto.*;
 import com.devsong.server.user.dto.*;
 import com.devsong.server.user.service.UserService;
 import com.devsong.server.user.service.ResumeService;
@@ -11,10 +10,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 
 
 
