@@ -24,4 +24,17 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     // 내가 쓴 글 조회
     List<Post> findByUserIdOrderByIdDesc(Long userId);
+
+    // 모집여부별 조회 - 최신순
+    Page<Post> findAllByClosedOrderByCreatedAtDesc(boolean closed, Pageable pageable);
+
+    // 모집여부별 조회 - 좋아요순
+    Page<Post> findAllByClosedOrderByLikeCountDesc(boolean closed, Pageable pageable);
+
+    // 카테고리+모집여부별 조회 - 최신순
+    Page<Post> findAllByCategoryAndClosedOrderByCreatedAtDesc(Category category, boolean closed, Pageable pageable);
+
+    // 카테고리+모집여부별 조회 - 좋아요순
+    Page<Post> findAllByCategoryAndClosedOrderByLikeCountDesc(Category category, boolean closed, Pageable pageable);
+
 }

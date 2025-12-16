@@ -1,5 +1,6 @@
 package com.devsong.server.post.dto;
 
+import com.devsong.server.post.entity.Category;
 import com.devsong.server.post.entity.Post;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,7 @@ public class PostListResponseDto {
     private final Long id;
     private final String title;
     private final String username;
-    private final String category;
+    private final Category category;
     private final String preview;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime createdAt;
