@@ -37,7 +37,7 @@ public class ResumeService {
         Long userId = getLoginUserId();
 
         Resume resume = resumeRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("이력서가 존재하지 않습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resume not found"));
 
         User user = resume.getUser();
 
@@ -61,7 +61,7 @@ public class ResumeService {
         Long userId = getLoginUserId();
 
         Resume resume = resumeRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Resume Not Found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resume not found"));
 
         resume.update(
                 dto.getInterests(),
