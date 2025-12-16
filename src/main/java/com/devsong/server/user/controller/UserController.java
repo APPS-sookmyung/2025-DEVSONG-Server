@@ -2,6 +2,7 @@ package com.devsong.server.user.controller;
 
 import com.devsong.server.user.dto.*;
 import com.devsong.server.user.service.UserService;
+import com.devsong.server.user.service.ResumeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -12,12 +13,14 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 
 
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserController {
 
-    private final UserService userService; //DI
+    private final UserService userService;
+    private final ResumeService resumeService;//DI
 
     @Operation(summary = "회원가입")
     @PostMapping("/signup") //회원가입
@@ -71,5 +74,19 @@ public class UserController {
     @GetMapping("/me/applies")
     public List<MyPostDto> getMyAppliedPosts(@AuthenticationPrincipal Long userId) {
         return userService.getMyAppliedPosts(userId);
+    }
+
+    @Operation(summary = "이력서 조회")
+    @GetMapping("/me/resume")
+    public ResponseEntity<ResumeResponseDto> getMyResume() {
+        return ResponseEntity.ok(resumeService.getResume());
+    }
+
+    @Operation(summary = "이력서 수정")
+    @PostMapping("/me/resume")
+    public ResponseEntity<UpdateResumeResponseDto> updateMyResume(
+            @RequestBody UpdateResumeRequestDto dto) {
+
+        return ResponseEntity.ok(resumeService.updateResume(dto));
     }
 }
