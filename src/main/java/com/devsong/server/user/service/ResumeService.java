@@ -63,6 +63,10 @@ public class ResumeService {
         Resume resume = resumeRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resume not found"));
 
+        resume.getUser().updateBojId(dto.getBojId());
+
+        resume.getUser().updateGithubId(dto.getGithubId());
+
         resume.update(
                 dto.getInterests(),
                 dto.getContent(),
