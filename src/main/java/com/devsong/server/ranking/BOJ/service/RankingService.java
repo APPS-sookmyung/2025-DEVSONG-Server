@@ -5,9 +5,12 @@ import com.devsong.server.ranking.BOJ.dto.SolvedAcResponseDto;
 import com.devsong.server.user.entity.User;
 import com.devsong.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional; // DB 수정하니까 트랜잭션 필수
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,57 +21,71 @@ public class RankingService {
     private final UserRepository userRepository;
     private final RestTemplate restTemplate;
 
-    public List<BojRankingResponseDto> getBojRanking() {
-        // DB에서 유저 가져오기
+     // 스케줄러 메서드
+    @Scheduled(cron = "0 0 0 * * *") // 매일 0시 0분 0초
+    @Transactional
+    public void updateBojRankings() {
+
+        // 백준 아이디 있는 유저 다 가져오기
         List<User> users = userRepository.findAll().stream()
                 .filter(u -> u.getBojId() != null && !u.getBojId().isBlank())
                 .toList();
 
-        if (users.isEmpty()) {
-            return Collections.emptyList();
-        }
+        if (users.isEmpty()) return;
 
-        // solved.ac API 호출
+        // API 호출을 위한 핸들 문자열 만들기
         String handles = users.stream()
                 .map(User::getBojId)
-                .map(String::trim) // 공백 제거
+                .map(String::trim)
                 .collect(Collectors.joining(","));
 
         String url = UriComponentsBuilder.fromHttpUrl("https://solved.ac/api/v3/user/lookup")
                 .queryParam("handles", handles)
                 .toUriString();
 
-        SolvedAcResponseDto[] solvedAcUsers = restTemplate.getForObject(url, SolvedAcResponseDto[].class);
+        SolvedAcResponseDto[] response = restTemplate.getForObject(url, SolvedAcResponseDto[].class);
 
-        if (solvedAcUsers == null) {
-            return Collections.emptyList();
-        }
+        if (response == null) return;
 
-        Map<String, SolvedAcResponseDto> infoMap = Arrays.stream(solvedAcUsers)
+        // 받아온 데이터를 Map으로 변환
+        Map<String, SolvedAcResponseDto> infoMap = Arrays.stream(response)
                 .collect(Collectors.toMap(
                         dto -> dto.getHandle().toLowerCase(),
                         dto -> dto
                 ));
 
-        List<BojRankingResponseDto> rankingList = new ArrayList<>();
-
-        // 유저 정보와 API 정보 합치기
+        // DB 유저 정보 업데이트
         for (User user : users) {
-            String dbBojId = user.getBojId().trim();
-            SolvedAcResponseDto info = infoMap.get(dbBojId.toLowerCase());
-
+            SolvedAcResponseDto info = infoMap.get(user.getBojId().toLowerCase().trim());
             if (info != null) {
-                rankingList.add(BojRankingResponseDto.builder()
-                        .rank(0)
-                        .username(user.getUsername())
-                        .bojId(user.getBojId())
-                        .rating(info.getRating())
-                        .solvedCount(info.getSolvedCount())
-                        .build());
+                // User 엔티티에 새로 만든 메서드로 값 갱신
+                user.updateBojInfo(info.getRating(), info.getSolvedCount());
             }
         }
+    }
 
-        // 정렬 (레이팅 내림차순)
+    // 조회 메서드
+    @Transactional(readOnly = true)
+    public List<BojRankingResponseDto> getBojRanking() {
+        // DB에서 유저 다 가져오기
+        List<User> users = userRepository.findAll().stream()
+                .filter(u -> u.getBojId() != null && !u.getBojId().isBlank())
+                .toList();
+
+        // DTO로 변환
+        List<BojRankingResponseDto> rankingList = new ArrayList<>();
+
+        for (User user : users) {
+            rankingList.add(BojRankingResponseDto.builder()
+                    .rank(0)
+                    .username(user.getUsername())
+                    .bojId(user.getBojId())
+                    .rating(user.getBojRating())
+                    .solvedCount(user.getBojSolvedCount())
+                    .build());
+        }
+
+        // 점수 높은 순으로 정렬
         rankingList.sort(Comparator.comparingInt(BojRankingResponseDto::getRating).reversed());
 
         // 등수 매기기
