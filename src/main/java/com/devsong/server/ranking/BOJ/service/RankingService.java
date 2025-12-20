@@ -7,7 +7,7 @@ import com.devsong.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // DB 수정하니까 트랜잭션 필수
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -85,7 +85,7 @@ public class RankingService {
                     .build());
         }
 
-        // 점수 높은 순으로 정렬
+        // 정렬 (레이팅 내림차순)
         rankingList.sort(Comparator.comparingInt(BojRankingResponseDto::getRating).reversed());
 
         // 등수 매기기
