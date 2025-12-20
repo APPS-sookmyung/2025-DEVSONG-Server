@@ -50,7 +50,7 @@ public class RankingService {
         // 받아온 데이터를 Map으로 변환
         Map<String, SolvedAcResponseDto> infoMap = Arrays.stream(response)
                 .collect(Collectors.toMap(
-                        dto -> dto.getHandle().toLowerCase(),
+                        dto -> dto.getHandle().toLowerCase().trim(),
                         dto -> dto
                 ));
 
