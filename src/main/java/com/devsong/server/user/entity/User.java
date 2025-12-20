@@ -46,7 +46,7 @@ public class User {
     private List<TechStack> techStack; //기술스택
 
     //기술스택 수정
-    public void setTechStack(List<TechStack> techStack) {
+    public void updateTechStack(List<TechStack> techStack) {
         this.techStack = techStack;
     }
 
