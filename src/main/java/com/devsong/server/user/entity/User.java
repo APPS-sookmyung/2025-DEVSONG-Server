@@ -56,4 +56,12 @@ public class User {
         this.techStack = techStack;
     }
 
+    // 백준 랭킹 정보
+    private int bojRating = 0; // DB에 저장될 레이팅
+    private int bojSolvedCount = 0; // DB에 저장될 푼 문제 수
+
+    public void updateBojInfo(int rating, int solvedCount) {
+        this.bojRating = rating;
+        this.bojSolvedCount = solvedCount;
+    }
 }
