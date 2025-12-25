@@ -58,4 +58,10 @@ public class User {
         this.bojRating = rating;
         this.bojSolvedCount = solvedCount;
     }
+
+    //백준 아이디 수정
+    public void updateBojId(String bojId) { this.bojId = bojId; }
+
+    //깃허브 아이디 수정
+    public void updateGithubId(String githubId) { this.githubId = githubId; }
 }

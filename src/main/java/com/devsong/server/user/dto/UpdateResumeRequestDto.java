@@ -11,8 +11,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateResumeRequestDto {
-    private List<TechStack> techStack;
-    private List<TechStack> interests;
+    private String bojId;
+    private String githubId;
+    private List<TechStack> techStack; // 기술 스택
+    private List<String> interests; // 관심분야
     private String content;
     private String profileImage;
 }

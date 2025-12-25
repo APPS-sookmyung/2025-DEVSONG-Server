@@ -7,12 +7,8 @@ import com.devsong.server.user.repository.ResumeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.devsong.server.user.dto.UpdateResumeRequestDto;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
-
 
 @Service
 @RequiredArgsConstructor
@@ -20,21 +16,9 @@ public class ResumeService {
 
     private final ResumeRepository resumeRepository;
 
-    private Long getLoginUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || auth.getPrincipal() == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthenticated");
-        }
-
-        return (Long) auth.getPrincipal();
-    }
-
     //이력서 조회
     @Transactional(readOnly = true)
-    public ResumeResponseDto getResume() {
-
-        Long userId = getLoginUserId();
+    public ResumeResponseDto getResume(Long userId) {
 
         Resume resume = resumeRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resume not found"));
@@ -56,9 +40,7 @@ public class ResumeService {
 
     //이력서 수정
     @Transactional
-    public UpdateResumeResponseDto updateResume(UpdateResumeRequestDto dto) {
-
-        Long userId = getLoginUserId();
+    public UpdateResumeResponseDto updateResume(Long userId, UpdateResumeRequestDto dto) {
 
         Resume resume = resumeRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resume not found"));
@@ -73,9 +55,11 @@ public class ResumeService {
             resume.getUser().updateTechStack(dto.getTechStack());
         }
 
+        resume.getUser().updateBojId(dto.getBojId());
+        resume.getUser().updateGithubId(dto.getGithubId());
+
         return UpdateResumeResponseDto.builder()
                 .message("Update Success")
                 .build();
     }
-
 }
