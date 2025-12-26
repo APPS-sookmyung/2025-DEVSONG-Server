@@ -64,4 +64,13 @@ public class User {
         this.bojRating = rating;
         this.bojSolvedCount = solvedCount;
     }
+
+    // 깃허브 랭킹 정보
+    private int githubRating = 0; // DB에 저장될 레이팅
+    private int commitCount = 0; // DB에 저장될 커밋 수
+
+    public void updateGithubInfo(int rating, int solvedCount) {
+        this.githubRating = rating;
+        this.commitCount = solvedCount;
+    }
 }

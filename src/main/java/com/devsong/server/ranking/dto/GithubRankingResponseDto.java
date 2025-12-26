@@ -1,4 +1,4 @@
-package com.devsong.server.githubRanking.github.dto;
+package com.devsong.server.ranking.dto;
 
 import lombok.Builder;
 import lombok.Data;

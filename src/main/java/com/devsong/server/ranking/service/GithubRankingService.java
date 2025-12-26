@@ -1,13 +1,15 @@
-package com.devsong.server.ranking.github.service;
+package com.devsong.server.ranking.service;
 
-import com.devsong.server.ranking.github.dto.GithubRankingResponseDto;
-import com.devsong.server.ranking.github.dto.GithubSearchResponseDto;
+import com.devsong.server.ranking.dto.GithubRankingResponseDto;
+import com.devsong.server.ranking.dto.GithubSearchResponseDto;
 import com.devsong.server.user.entity.User;
 import com.devsong.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -18,6 +20,23 @@ public class GithubRankingService {
 
     private final UserRepository userRepository;
     private final RestTemplate restTemplate;
+
+    @Scheduled(cron = "0 10 0 * * *")
+    @Transactional
+    public void updateGithubRankings() {
+
+        List<User> users = userRepository.findAll().stream()
+                .filter(u -> u.getGithubId() != null && !u.getGithubId().isBlank())
+                .toList();
+
+        if (users.isEmpty()) return;
+
+        for (User user : users) {
+            int commitCount = fetchCommitCount(user.getGithubId().trim());
+
+            user.updateGithubInfo(0, commitCount);
+        }
+    }
 
     @Value("${github.token}")
     private String githubToken;
@@ -37,14 +56,13 @@ public class GithubRankingService {
 
         // 유저 정보와 API 정보 합치기
         for (User user : users) {
-            int commitCount = fetchCommitCount(user.getGithubId().trim());
 
             rankingList.add(
                     GithubRankingResponseDto.builder()
                             .rank(0)
                             .username(user.getUsername())
                             .githubId(user.getGithubId())
-                            .commitCount(commitCount)
+                            .commitCount(user.getCommitCount())
                             .build()
             );
         }
