@@ -45,6 +45,12 @@ public class User {
     @CollectionTable
     private List<TechStack> techStack; //기술스택
 
+    //백준 아이디 수정
+    public void updateBojId(String bojId) { this.bojId = bojId; }
+
+    //깃허브 아이디 수정
+    public void updateGithubId(String githubId) { this.githubId = githubId; }
+
     //기술스택 수정
     public void updateTechStack(List<TechStack> techStack) {
         this.techStack = techStack;

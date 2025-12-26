@@ -11,6 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateResumeRequestDto {
+    private String bojId;
+    private String githubId;
     private List<TechStack> techStack;
     private List<TechStack> interests;
     private String content;
