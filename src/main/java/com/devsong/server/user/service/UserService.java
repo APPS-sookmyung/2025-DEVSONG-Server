@@ -62,7 +62,10 @@ public class UserService {
         resumeRepository.save(resumeEntity);
 
         //UserRepository.FindByEmail로 id 찾기
-        Long Id = userRepository.findByEmail(userEntity.getEmail()).getId();
+        User savedUser = userRepository.findByEmail(userEntity.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found after signup"));
+
+        Long id = savedUser.getId();
 
         //id 를 ResponseDto로 변환 후 return
         return new SignupResponseDto("SignUp Success");
@@ -75,7 +78,9 @@ public class UserService {
         String password = loginRequestDto.getPassword();
 
         //UserRepository.FindByEmail로 id 찾기
-        User userEntity = userRepository.findByEmail(email);
+        User userEntity = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
 
         //UserRepository에서 비밀번호 일치하는지 확인
         //ResponseDto로 변환 후 return
