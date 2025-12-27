@@ -59,8 +59,11 @@ public class RankingService {
                 .queryParam("handles", handles)
                 .toUriString();
 
-        SolvedAcResponseDto[] response = restTemplate.getForObject(url, SolvedAcResponseDto[].class);
-
+        SolvedAcResponseDto[] response;
+        try { response = restTemplate.getForObject(url, SolvedAcResponseDto[].class);
+        } catch (Exception e) {
+            return;
+        }
         if (response == null) return;
 
         // 받아온 데이터를 Map으로 변환
@@ -126,15 +129,20 @@ public class RankingService {
         String sinceDate = getThisWeek();
 
         for (User user : users) {
-            int commitCount = fetchCommitCount(user.getGithubId().trim(), sinceDate);
+            try {
+                int commitCount = fetchCommitCount(user.getGithubId().trim(), sinceDate);
 
-            user.updateGithubInfo(0, commitCount);
+                user.updateGithubInfo(0, commitCount);
+            } catch (Exception e) {
+                continue;
+            }
         }
     }
 
     @Value("${github.token}")
     private String githubToken;
 
+    @Transactional(readOnly = true)
     public List<GithubRankingResponseDto> getGithubRanking() {
 
         // DB에서 유저 가져오기
@@ -175,9 +183,14 @@ public class RankingService {
 
     // GitHub Search API 호출
     private int fetchCommitCount(String githubId, String sinceDate) {
-        String url = "https://api.github.com/search/commits"
-                + "?q=author:" + githubId
-                + "+author-date:>=" + sinceDate;
+        String query = "committer:" + githubId;
+
+        String url = UriComponentsBuilder
+                .fromHttpUrl("https://api.github.com/search/commits")
+                .queryParam("q", query)
+                .build()
+                .encode()
+                .toUriString();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(githubToken);
