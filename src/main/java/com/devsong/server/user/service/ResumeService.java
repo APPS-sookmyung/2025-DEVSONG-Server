@@ -59,9 +59,6 @@ public class ResumeService {
             resume.getUser().updateTechStack(dto.getTechStack());
         }
 
-        resume.getUser().updateBojId(dto.getBojId());
-        resume.getUser().updateGithubId(dto.getGithubId());
-
         return UpdateResumeResponseDto.builder()
                 .message("Update Success")
                 .build();
