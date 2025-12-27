@@ -45,9 +45,23 @@ public class User {
     @CollectionTable
     private List<TechStack> techStack; //기술스택
 
+    //백준 아이디 수정
+    public void updateBojId(String bojId) { this.bojId = bojId; }
+
+    //깃허브 아이디 수정
+    public void updateGithubId(String githubId) { this.githubId = githubId; }
+
     //기술스택 수정
-    public void setTechStack(List<TechStack> techStack) {
+    public void updateTechStack(List<TechStack> techStack) {
         this.techStack = techStack;
     }
 
+    // 백준 랭킹 정보
+    private int bojRating = 0; // DB에 저장될 레이팅
+    private int bojSolvedCount = 0; // DB에 저장될 푼 문제 수
+
+    public void updateBojInfo(int rating, int solvedCount) {
+        this.bojRating = rating;
+        this.bojSolvedCount = solvedCount;
+    }
 }

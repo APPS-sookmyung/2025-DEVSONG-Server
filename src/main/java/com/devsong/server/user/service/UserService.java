@@ -2,8 +2,10 @@ package com.devsong.server.user.service;
 
 import com.devsong.server.jwt.JwtTokenProvider;
 import com.devsong.server.user.dto.*;
+import com.devsong.server.user.entity.Resume;
 import com.devsong.server.user.entity.TechStack;
 import com.devsong.server.user.entity.User;
+import com.devsong.server.user.repository.ResumeRepository;
 import com.devsong.server.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +21,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import org.springframework.security.access.AccessDeniedException;
 import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -34,6 +34,7 @@ public class UserService {
     private final CommentRepository commentRepository;
     private final PostLikeRepository postLikeRepository;
     private final PostApplyRepository postApplyRepository;
+    private final ResumeRepository resumeRepository;
 
     // 회원가입
     public SignupResponseDto signup(SignupRequestDto signupRequestDto) {
@@ -51,6 +52,14 @@ public class UserService {
 
         //UserRepository.save DB에 저장
         userRepository.save(userEntity);
+
+        Resume resumeEntity = Resume.builder()
+                .user(userEntity)
+                .content("")
+                .profileImage(null)
+                .build();
+
+        resumeRepository.save(resumeEntity);
 
         //UserRepository.FindByEmail로 id 찾기
         Long Id = userRepository.findByEmail(userEntity.getEmail()).getId();
@@ -111,7 +120,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        user.setTechStack(incoming == null ? Collections.emptyList() : incoming);
+        user.updateTechStack(incoming == null ? Collections.emptyList() : incoming);
 
         return UpdateTechStackResponseDto.builder()
                 .message("Update Success")

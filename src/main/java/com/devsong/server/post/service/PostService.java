@@ -22,7 +22,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PostService {
+public class PostService{
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostLikeRepository postLikeRepository;
@@ -55,6 +55,7 @@ public class PostService {
         postRepository.save(post);
         return new PostCreateResponseDto(post.getId());
     }
+
 
 
     //게시글 상세정보 조회 (없을 시 코멘트 출력)
@@ -97,23 +98,34 @@ public class PostService {
 
     //게시글 목록 조회
     @Transactional(readOnly = true)
-    public PostPageResponseDto findPosts(String category, String sortBy, int page) {
+    public PostPageResponseDto findPosts(String category, String sortBy, int page, Boolean closed) {
         Pageable pageable = PageRequest.of(page, 10); // 한 페이지당 10개 고정
 
         Page<Post> posts;
         boolean sortByLike = "like".equalsIgnoreCase(sortBy);
 
-        if (category == null || category.isEmpty()) {
-            // 전체 게시글 조회
-            posts = sortByLike
-                    ? postRepository.findAllByOrderByLikeCountDesc(pageable)
-                    : postRepository.findAllByOrderByCreatedAtDesc(pageable);
+        if (closed == null) {
+            if (category == null || category.isEmpty()) {
+                posts = sortByLike
+                        ? postRepository.findAllByOrderByLikeCountDesc(pageable)
+                        : postRepository.findAllByOrderByCreatedAtDesc(pageable);
+            } else {
+                Category categoryEnum = Category.from(category);
+                posts = sortByLike
+                        ? postRepository.findAllByCategoryOrderByLikeCountDesc(categoryEnum, pageable)
+                        : postRepository.findAllByCategoryOrderByCreatedAtDesc(categoryEnum, pageable);
+            }
         } else {
-            // 카테고리별 게시글 조회
-            Category categoryEnum = Category.from(category);
-            posts = sortByLike
-                    ? postRepository.findAllByCategoryOrderByLikeCountDesc(categoryEnum, pageable)
-                    : postRepository.findAllByCategoryOrderByCreatedAtDesc(categoryEnum, pageable);
+            if (category == null || category.isEmpty()) {
+                posts = sortByLike
+                        ? postRepository.findAllByClosedOrderByLikeCountDesc(closed, pageable)
+                        : postRepository.findAllByClosedOrderByCreatedAtDesc(closed, pageable);
+            } else {
+                Category categoryEnum = Category.from(category);
+                posts = sortByLike
+                        ? postRepository.findAllByCategoryAndClosedOrderByLikeCountDesc(categoryEnum, closed, pageable)
+                        : postRepository.findAllByCategoryAndClosedOrderByCreatedAtDesc(categoryEnum, closed, pageable);
+            }
         }
 
         // 게시글 DTO로 변환
@@ -231,4 +243,3 @@ public class PostService {
         if (dto.getContent() != null) post.setContent(dto.getContent());
     }
 }
-
