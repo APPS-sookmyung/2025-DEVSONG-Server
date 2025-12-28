@@ -14,6 +14,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final StompAuthChannelInterceptor stompAuthChannelInterceptor;
+    private final JwtHandshakeInterceptor jwtHandshakeInterceptor;
 
     //수신자 검증
     @Override
@@ -25,6 +26,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
+                .setAllowedOriginPatterns("*")
+                .addInterceptors(jwtHandshakeInterceptor)
                 .withSockJS();
     }
 

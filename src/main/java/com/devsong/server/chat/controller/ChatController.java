@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 import java.util.List;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 public class ChatController {
 
@@ -27,6 +27,10 @@ public class ChatController {
     //메세지 전송
     @MessageMapping("/chat/send")
     public void send(ChatMessageDto dto, Principal principal) {
+        if (principal == null) {
+            System.out.println("Principal is NULL");
+            return;
+        }
         Long senderId = Long.valueOf(principal.getName());
         chatService.sendMessage(dto, senderId);
     }
