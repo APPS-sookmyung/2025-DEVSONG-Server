@@ -45,6 +45,9 @@ dependencies {
 	//aws 관련 의존성
 	implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.1.1')
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
+
+	//email 관련 의존성
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {
