@@ -1,8 +1,8 @@
 package com.devsong.server.ranking.service;
 
 import com.devsong.server.ranking.dto.BojRankingResponseDto;
+import com.devsong.server.ranking.dto.GithubEventResponseDto;
 import com.devsong.server.ranking.dto.GithubRankingResponseDto;
-import com.devsong.server.ranking.dto.GithubSearchResponseDto;
 import com.devsong.server.ranking.dto.SolvedAcResponseDto;
 import com.devsong.server.user.entity.User;
 import com.devsong.server.user.repository.UserRepository;
@@ -18,8 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,6 +29,10 @@ public class RankingService {
 
     private final UserRepository userRepository;
     private final RestTemplate restTemplate;
+
+    //깃허브 토큰 주입
+    @Value("${github.token}")
+    private String githubToken;
 
     private String getThisWeek() {
         return LocalDate.now()
@@ -120,32 +124,83 @@ public class RankingService {
     @Transactional
     public void updateGithubRankings() {
 
+
+
+        LocalDate weekStart = LocalDate.now()
+                .with(DayOfWeek.MONDAY);
+
         List<User> users = userRepository.findAll().stream()
                 .filter(u -> u.getGithubId() != null && !u.getGithubId().isBlank())
                 .toList();
 
         if (users.isEmpty()) return;
 
-        String sinceDate = getThisWeek();
-
         for (User user : users) {
             try {
-                int commitCount = fetchCommitCount(user.getGithubId().trim(), sinceDate);
+                HttpHeaders headers = new HttpHeaders();
+                headers.setBearerAuth(githubToken);
+                HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+                //Events API 호출
+                String url = UriComponentsBuilder
+                        .fromHttpUrl("https://api.github.com/users/{username}/events/public")
+                        .queryParam("per_page", 100)
+                        .buildAndExpand(user.getGithubId().trim())
+                        .toUriString();
+
+                ResponseEntity<GithubEventResponseDto[]> response =
+                        restTemplate.exchange(
+                                url,
+                                HttpMethod.GET,
+                                entity,
+                                GithubEventResponseDto[].class
+                        );
+
+                GithubEventResponseDto[] events = response.getBody();
+
+
+
+                if (events == null || events.length == 0) {
+                    user.updateGithubInfo(0, 0);
+                    continue;
+                }
+
+                int commitCount = 0;
+
+                for (GithubEventResponseDto event : events) {
+
+                    if (!"PushEvent".equals(event.getType())) continue;
+
+                    ZonedDateTime eventTimeUtc =
+                            ZonedDateTime.parse(event.getCreated_at());
+
+                    LocalDate eventDateKst =
+                            eventTimeUtc.withZoneSameInstant(ZoneId.of("Asia/Seoul"))
+                                    .toLocalDate();
+
+
+                    //이번 주 이전 이벤트면 중단
+                    if (eventDateKst.isBefore(weekStart)) continue;
+
+                    if (event.getPayload() != null
+                            && event.getPayload().getCommits() != null) {
+                        commitCount += event.getPayload().getCommits().size();
+                    }
+                }
 
                 user.updateGithubInfo(0, commitCount);
-            } catch (Exception e) {
-                continue;
+
+            } catch (Exception ignored) {
+                //실패한 유저는 스킵
             }
         }
     }
 
-    @Value("${github.token}")
-    private String githubToken;
 
+    //조회
     @Transactional(readOnly = true)
     public List<GithubRankingResponseDto> getGithubRanking() {
 
-        // DB에서 유저 가져오기
         List<User> users = userRepository.findAll().stream()
                 .filter(u -> u.getGithubId() != null && !u.getGithubId().isBlank())
                 .toList();
@@ -156,9 +211,7 @@ public class RankingService {
 
         List<GithubRankingResponseDto> rankingList = new ArrayList<>();
 
-        // 유저 정보와 API 정보 합치기
         for (User user : users) {
-
             rankingList.add(
                     GithubRankingResponseDto.builder()
                             .rank(0)
@@ -169,11 +222,11 @@ public class RankingService {
             );
         }
 
-        // 정렬 (커밋 수 내림차순)
         rankingList.sort(
-                Comparator.comparingInt(GithubRankingResponseDto::getCommitCount).reversed());
+                Comparator.comparingInt(GithubRankingResponseDto::getCommitCount)
+                        .reversed()
+        );
 
-        // 등수 매기기
         for (int i = 0; i < rankingList.size(); i++) {
             rankingList.get(i).setRank(i + 1);
         }
@@ -181,38 +234,4 @@ public class RankingService {
         return rankingList;
     }
 
-    // GitHub Search API 호출
-    private int fetchCommitCount(String githubId, String sinceDate) {
-        String query = "committer:" + githubId;
-
-        String url = UriComponentsBuilder
-                .fromHttpUrl("https://api.github.com/search/commits")
-                .queryParam("q", query)
-                .build()
-                .encode()
-                .toUriString();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(githubToken);
-        headers.set(
-                "Accept",
-                "application/vnd.github.cloak-preview+json"
-        );
-
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
-
-        ResponseEntity<GithubSearchResponseDto> response =
-                restTemplate.exchange(
-                        url,
-                        HttpMethod.GET,
-                        entity,
-                        GithubSearchResponseDto.class
-                );
-
-        if (response.getBody() == null) {
-            return 0;
-        }
-
-        return response.getBody().getTotal_count();
-    }
 }
