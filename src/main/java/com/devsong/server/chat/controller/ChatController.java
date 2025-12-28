@@ -8,6 +8,7 @@ import com.devsong.server.user.entity.User;
 import com.devsong.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,12 +36,9 @@ public class ChatController {
     @GetMapping("/chat/rooms/{roomId}/messages")
     public List<ChatMessageResponseDto> getMessages(
             @PathVariable Long roomId,
-            Principal principal
+            Authentication authentication
     ) {
-        String email = principal.getName();
-        Long me = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"))
-                .getId();
+        Long me = (Long) authentication.getPrincipal();
         return chatService.getMessages(roomId, me);
     }
 
