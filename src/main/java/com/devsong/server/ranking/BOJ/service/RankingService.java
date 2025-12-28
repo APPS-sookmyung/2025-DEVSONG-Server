@@ -1,4 +1,4 @@
-package com.devsong.server.ranking.BOJ.Service;
+package com.devsong.server.ranking.BOJ.service;
 
 import com.devsong.server.ranking.BOJ.dto.BojRankingResponseDto;
 import com.devsong.server.ranking.BOJ.dto.SolvedAcResponseDto;

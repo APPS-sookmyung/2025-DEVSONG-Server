@@ -1,7 +1,7 @@
 package com.devsong.server.ranking.BOJ.controller;
 
 import com.devsong.server.ranking.BOJ.dto.BojRankingResponseDto;
-import com.devsong.server.ranking.BOJ.Service.RankingService;
+import com.devsong.server.ranking.BOJ.service.RankingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
