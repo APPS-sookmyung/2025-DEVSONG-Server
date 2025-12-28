@@ -1,6 +1,6 @@
 services:
   backend:
-    image: chaeeah/devsong-server:1.0
+    image: chaeeah/devsong-server:latest
     container_name: devsong
     ports:
       - "8080:8080"
