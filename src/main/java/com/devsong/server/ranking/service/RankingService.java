@@ -115,7 +115,7 @@ public class RankingService {
     @Transactional
     public void updateGithubRankings() {
 
-        LocalDate weekStart = LocalDate.now().with(DayOfWeek.MONDAY);
+        LocalDate weekStart = LocalDate.now(ZoneId.of("Asia/Seoul")).with(DayOfWeek.MONDAY);
 
         //깃허브 아이디 있는 유저만 조회
         List<User> users = userRepository.findAll().stream()
@@ -158,6 +158,8 @@ public class RankingService {
         GithubEventResponseDto[] events = response.getBody();
         if (events == null) return 0;
 
+        LocalDate weekEnd = weekStart.plusDays(7);
+
         int commitCount = 0;
 
         for (GithubEventResponseDto event : events) {
@@ -172,7 +174,7 @@ public class RankingService {
                             .withZoneSameInstant(ZoneId.of("Asia/Seoul"))
                             .toLocalDate();
 
-            if (eventDateKst.isBefore(weekStart)) continue;
+            if (eventDateKst.isBefore(weekStart) || !eventDateKst.isBefore(weekEnd)) continue;
 
             commitCount += 1;
         }
