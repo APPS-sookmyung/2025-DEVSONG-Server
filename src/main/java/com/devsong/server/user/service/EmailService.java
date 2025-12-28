@@ -10,7 +10,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import com.devsong.server.user.repository.*;
 
 import java.time.LocalDateTime;
-import java.util.Random;
+import java.security.SecureRandom;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -83,7 +83,7 @@ public class EmailService {
     }
 
     private String generateCode() {
-        Random random = new Random();
+        SecureRandom random = new SecureRandom();
         return String.format("%06d", random.nextInt(1000000));
     }
 
