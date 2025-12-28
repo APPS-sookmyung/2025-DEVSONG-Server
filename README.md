@@ -3,13 +3,13 @@
 
 ## 🏄🏻‍♀️ Team
 
-| name                                        | major        | role | Email                |
-| -------------------------------------------- | -------------- | ------ | -------------------- |
+| name                                        | major        | role | Email                    |
+| -------------------------------------------- | -------------- | ------ |--------------------------|
 | [CHAEAH WOO](https://github.com/chaeeah) | Computer Science | PM / BE | chaeah23@sookmyung.ac.kr |
 | [SUMIN BAEK](https://github.com/suminb99) | Computer Science | FE | suminb99@sookmyung.ac.kr |
-| [JIHEE BANG](https://github.com/Bangjh05) | Computer Science | FE / BE |  |
-| [EUNCHAE LEE](https://github.com/echae0111) | Computer Science | BE | |
-| [DOYEON KIM](https://github.com/) | Visual Design | DESIGN | |
+| [JIHEE BANG](https://github.com/Bangjh05) | Computer Science | FE / BE | bangjh@sookmyung.ac.kr   |
+| [EUNCHAE LEE](https://github.com/echae0111) | Computer Science | BE |                          |
+| [DOYEON KIM](https://github.com/) | Visual Design | DESIGN |                          |
 <br />
 
 ## 📅 개발 기간
