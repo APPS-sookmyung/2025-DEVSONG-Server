@@ -25,6 +25,7 @@ public class EmailVerification {
     public void updateCode(String code, int durationMinutes) {
         this.code = code;
         this.expirationTime = LocalDateTime.now().plusMinutes(durationMinutes);
+        this.attemptCount = 0; // 재발송 시 시도 횟수 초기화
     }
 
     // 만료 여부 확인
