@@ -19,7 +19,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,15 +29,9 @@ public class RankingService {
     private final UserRepository userRepository;
     private final RestTemplate restTemplate;
 
-    //깃허브 토큰 주입
     @Value("${github.token}")
     private String githubToken;
 
-    private String getThisWeek() {
-        return LocalDate.now()
-                .with(DayOfWeek.MONDAY)
-                .toString();
-    }
 
     //백준
     // 스케줄러 메서드
@@ -63,12 +56,10 @@ public class RankingService {
                 .queryParam("handles", handles)
                 .toUriString();
 
-        SolvedAcResponseDto[] response;
-        try { response = restTemplate.getForObject(url, SolvedAcResponseDto[].class);
-        } catch (Exception e) {
-            return;
-        }
+        SolvedAcResponseDto[] response = restTemplate.getForObject(url, SolvedAcResponseDto[].class);
+
         if (response == null) return;
+
 
         // 받아온 데이터를 Map으로 변환
         Map<String, SolvedAcResponseDto> infoMap = Arrays.stream(response)
@@ -120,84 +111,76 @@ public class RankingService {
     }
 
     //깃허브
-    @Scheduled(cron = "0 10 0 * * *")
+    @Scheduled(cron = "0 0 0 * * *") // 매일 0시 0분 0초
     @Transactional
     public void updateGithubRankings() {
 
+        LocalDate weekStart = LocalDate.now().with(DayOfWeek.MONDAY);
 
-
-        LocalDate weekStart = LocalDate.now()
-                .with(DayOfWeek.MONDAY);
-
+        //깃허브 아이디 있는 유저만 조회
         List<User> users = userRepository.findAll().stream()
                 .filter(u -> u.getGithubId() != null && !u.getGithubId().isBlank())
                 .toList();
 
         if (users.isEmpty()) return;
 
+        //각 유저별로 주간 커밋 수 계산
         for (User user : users) {
-            try {
-                HttpHeaders headers = new HttpHeaders();
-                headers.setBearerAuth(githubToken);
-                HttpEntity<Void> entity = new HttpEntity<>(headers);
-
-                //Events API 호출
-                String url = UriComponentsBuilder
-                        .fromHttpUrl("https://api.github.com/users/{username}/events/public")
-                        .queryParam("per_page", 100)
-                        .buildAndExpand(user.getGithubId().trim())
-                        .toUriString();
-
-                ResponseEntity<GithubEventResponseDto[]> response =
-                        restTemplate.exchange(
-                                url,
-                                HttpMethod.GET,
-                                entity,
-                                GithubEventResponseDto[].class
-                        );
-
-                GithubEventResponseDto[] events = response.getBody();
-
-
-
-                if (events == null || events.length == 0) {
-                    user.updateGithubInfo(0, 0);
-                    continue;
-                }
-
-                int commitCount = 0;
-
-                for (GithubEventResponseDto event : events) {
-
-                    if (!"PushEvent".equals(event.getType())) continue;
-
-                    ZonedDateTime eventTimeUtc =
-                            ZonedDateTime.parse(event.getCreated_at());
-
-                    LocalDate eventDateKst =
-                            eventTimeUtc.withZoneSameInstant(ZoneId.of("Asia/Seoul"))
-                                    .toLocalDate();
-
-
-                    //이번 주 이전 이벤트면 중단
-                    if (eventDateKst.isBefore(weekStart)) continue;
-
-                    if (event.getPayload() != null
-                            && event.getPayload().getCommits() != null) {
-                        commitCount += event.getPayload().getCommits().size();
-                    }
-                }
-
-                user.updateGithubInfo(0, commitCount);
-
-            } catch (Exception ignored) {
-                //실패한 유저는 스킵
-            }
+            int weeklyCommitCount =
+                    fetchWeeklyCommitCount(user.getGithubId(), weekStart);
+            user.updateGithubInfo(0, weeklyCommitCount);
         }
     }
 
+    //주간 커밋 수 집계
+    private int fetchWeeklyCommitCount(String githubId, LocalDate weekStart) {
 
-    //조회
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(githubToken.trim());
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+
+        //Github Event API
+        String url = UriComponentsBuilder
+                .fromHttpUrl("https://api.github.com/users/{username}/events/public")
+                .queryParam("per_page", 100)
+                .buildAndExpand(githubId.trim())
+                .toUriString();
+
+        ResponseEntity<GithubEventResponseDto[]> response =
+                restTemplate.exchange(
+                        url,
+                        HttpMethod.GET,
+                        entity,
+                        GithubEventResponseDto[].class
+                );
+
+        GithubEventResponseDto[] events = response.getBody();
+        if (events == null) return 0;
+
+        int commitCount = 0;
+
+        for (GithubEventResponseDto event : events) {
+
+            if (!"PushEvent".equals(event.getType())) continue;
+
+            ZonedDateTime eventTimeUtc =
+                    ZonedDateTime.parse(event.getCreated_at());
+
+            LocalDate eventDateKst =
+                    eventTimeUtc
+                            .withZoneSameInstant(ZoneId.of("Asia/Seoul"))
+                            .toLocalDate();
+
+            if (eventDateKst.isBefore(weekStart)) continue;
+
+            commitCount += 1;
+        }
+
+        return commitCount;
+    }
+
+    // 조회 메서드
     @Transactional(readOnly = true)
     public List<GithubRankingResponseDto> getGithubRanking() {
 
@@ -233,5 +216,4 @@ public class RankingService {
 
         return rankingList;
     }
-
 }

@@ -1,5 +1,6 @@
 package com.devsong.server.ranking.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,13 +10,15 @@ import java.util.List;
 @NoArgsConstructor
 public class GithubEventResponseDto {
 
-    private String type;           // PushEvent, PullRequestEvent 등
-    private String created_at;     // 이벤트 발생 시각
+    private String type;
+    private String created_at;
     private Payload payload;
 
     @Getter
     @NoArgsConstructor
     public static class Payload {
+
+        @JsonProperty("commits")
         private List<Commit> commits;
     }
 
@@ -25,4 +28,3 @@ public class GithubEventResponseDto {
         private String sha;
     }
 }
-
