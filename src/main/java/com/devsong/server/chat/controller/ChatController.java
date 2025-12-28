@@ -4,17 +4,19 @@ import com.devsong.server.chat.dto.ChatMessageDto;
 import com.devsong.server.chat.dto.ChatMessageResponseDto;
 import com.devsong.server.chat.entity.ChatMessage;
 import com.devsong.server.chat.service.ChatService;
+import com.devsong.server.user.entity.User;
 import com.devsong.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class ChatController {
 
@@ -24,11 +26,8 @@ public class ChatController {
     //메세지 전송
     @MessageMapping("/chat/send")
     public void send(ChatMessageDto dto, Principal principal) {
-        String email = principal.getName();
-        Long me = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"))
-                .getId();
-        chatService.sendMessage(dto, me);
+        Long senderId = Long.valueOf(principal.getName());
+        chatService.sendMessage(dto, senderId);
     }
 
 

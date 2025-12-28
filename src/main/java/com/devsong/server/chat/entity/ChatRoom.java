@@ -24,9 +24,5 @@ public class ChatRoom {
         this.userBId = userBId;
     }
 
-    public boolean isParticipant(Long userId) {
-        return userId != null && (userId.equals(userAId) || userId.equals(userBId));
-    }
-
 }
 

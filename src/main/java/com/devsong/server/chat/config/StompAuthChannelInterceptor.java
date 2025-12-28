@@ -1,5 +1,6 @@
 package com.devsong.server.chat.config;
 
+import com.devsong.server.chat.service.ChatRoomService;
 import com.devsong.server.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
@@ -18,7 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StompAuthChannelInterceptor implements ChannelInterceptor {
 
-    private final JwtTokenProvider jwtTokenProvider; // 너 프로젝트에 있는 토큰 검증/파싱 클래스
+    private final JwtTokenProvider jwtTokenProvider;
+    private final ChatRoomService chatRoomService;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -40,6 +42,27 @@ public class StompAuthChannelInterceptor implements ChannelInterceptor {
                     new UsernamePasswordAuthenticationToken(userId.toString(), null, List.of());
 
             accessor.setUser(authentication);
+        }
+
+        if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
+
+            Authentication auth = (Authentication) accessor.getUser();
+            if (auth == null) {
+                throw new IllegalArgumentException("Unauthenticated subscribe");
+            }
+
+            Long userId = Long.valueOf(auth.getName());
+            String destination = accessor.getDestination();
+
+            if (destination != null && destination.startsWith("/topic/chat/room/")) {
+                Long roomId = Long.valueOf(
+                        destination.substring("/topic/chat/room/".length())
+                );
+
+                if (!chatRoomService.isParticipant(roomId, userId)) {
+                    throw new IllegalArgumentException("No permission to subscribe this room");
+                }
+            }
         }
 
         return message;
