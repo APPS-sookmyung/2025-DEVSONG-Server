@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 
-
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
@@ -78,15 +76,15 @@ public class UserController {
 
     @Operation(summary = "이력서 조회")
     @GetMapping("/me/resume")
-    public ResponseEntity<ResumeResponseDto> getMyResume() {
-        return ResponseEntity.ok(resumeService.getResume());
+    public ResponseEntity<ResumeResponseDto> getMyResume(@AuthenticationPrincipal Long userId) {
+        return ResponseEntity.ok(resumeService.getResume(userId));
     }
 
     @Operation(summary = "이력서 수정")
     @PostMapping("/me/resume")
     public ResponseEntity<UpdateResumeResponseDto> updateMyResume(
+            @AuthenticationPrincipal Long userId,
             @RequestBody UpdateResumeRequestDto dto) {
-
-        return ResponseEntity.ok(resumeService.updateResume(dto));
+        return ResponseEntity.ok(resumeService.updateResume(userId, dto));
     }
 }

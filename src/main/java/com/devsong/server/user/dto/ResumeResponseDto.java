@@ -25,7 +25,7 @@ public class ResumeResponseDto {
 
     private List<TechStack> techStack; //기술스택
 
-    private List<TechStack> interests; //관심분야
+    private List<String> interests; //관심분야
 
     private String content; //자기소개
 
