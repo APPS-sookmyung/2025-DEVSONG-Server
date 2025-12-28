@@ -14,6 +14,7 @@ import java.security.SecureRandom;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class EmailService {
     private final EmailVerificationRepository verificationRepository; // 추가
     private final JavaMailSender mailSender;
 
+    @Transactional
     public String sendEmail(EmailRequestDto emailRequestDto) {
         String email = emailRequestDto.getEmail();
 
@@ -36,21 +38,23 @@ public class EmailService {
 
         // 기존에 발송한 이메일 정보가 있다면 업데이트, 없다면 새로 생성
         EmailVerification verification = verificationRepository.findById(email)
-                .orElse(new EmailVerification(email, verificationCode, LocalDateTime.now().plusMinutes(5)));
+                .orElse(new EmailVerification(email, verificationCode, LocalDateTime.now().plusMinutes(5), 0));
 
         verification.updateCode(verificationCode, 5); // 5분 유효
         verificationRepository.save(verification);
+        verificationRepository.flush();
 
         // 3. 이메일 발송
         try {
             sendMail(email, verificationCode);
-            return "Sended code";
+            return "Sent code";
         } catch (MessagingException e) {
-            return "Sending Fail";
+            throw new RuntimeException("Failed to send email", e);
         }
     }
 
     // 인증번호 검증 로직 완성
+    @Transactional
     public EmailResponseDto verifyEmail(EmailVerifyRequestDto emailVerifyRequestDto) {
         String email = emailVerifyRequestDto.getEmail();
         String inputCode = emailVerifyRequestDto.getCode();
@@ -71,8 +75,11 @@ public class EmailService {
             return new EmailResponseDto(false);
         }
 
-        if (!verification.getCode().equals(inputCode)) {
-            // 번호 불일치
+        if (!verification.getCode().equals(inputCode)) { // 인증번호 불일치할 경우
+            //인증 시도 횟수 확인
+            if (verification.incrementAttemptAndCheckLimit()) verificationRepository.delete(verification);
+            else verificationRepository.save(verification);
+
             return new EmailResponseDto(false);
         }
 
