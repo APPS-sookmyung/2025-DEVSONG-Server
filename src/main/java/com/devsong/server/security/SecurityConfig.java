@@ -1,4 +1,4 @@
-package com.devsong.server.jwt;
+package com.devsong.server.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

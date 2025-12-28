@@ -73,4 +73,23 @@ public class User {
         this.githubRating = rating;
         this.commitCount = solvedCount;
     }
+
+    //프로필 사진 정보
+    @Column(nullable = true)
+    private String profileImageUrl; // public URL
+
+    @Column(nullable = true)
+    private String profileS3Key;    // S3에서 파일명
+
+    // 프로필 이미지 업데이트 시 호출할 메서드
+    public void updateProfileImage(String url, String key) {
+        this.profileImageUrl = url;
+        this.profileS3Key = key;
+    }
+
+    // 프로필 이미지 제거 시 호출
+    public void deleteProfileImage() {
+        this.profileImageUrl = null;
+        this.profileS3Key = null;
+    }
 }

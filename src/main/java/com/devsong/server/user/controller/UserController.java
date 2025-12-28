@@ -4,7 +4,9 @@ import com.devsong.server.user.dto.*;
 import com.devsong.server.user.service.EmailService;
 import com.devsong.server.user.service.UserService;
 import com.devsong.server.user.service.ResumeService;
+import com.devsong.server.user.service.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,15 +14,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserController {
 
+    //DI
     private final UserService userService;
     private final ResumeService resumeService;
-    private final EmailService emailService; //DI
+    private final S3Service s3Service;
+    private final EmailService emailService;
 
     @Operation(summary = "회원가입")
     @PostMapping("/signup") //회원가입
@@ -100,5 +105,23 @@ public class UserController {
             @AuthenticationPrincipal Long userId,
             @RequestBody UpdateResumeRequestDto dto) {
         return ResponseEntity.ok(resumeService.updateResume(userId, dto));
+    }
+
+    @Operation(summary = "내 프로필 사진 업로드")
+    @PostMapping(value = "/profile/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> uploadProfileImage(
+            @AuthenticationPrincipal Long userId,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+
+        String profileImageUrl = s3Service.upload(userId, image);
+        return ResponseEntity.ok(profileImageUrl);
+    }
+
+    @Operation(summary = "내 프로필 사진 삭제")
+    @PostMapping("/profile/delete")
+    public ResponseEntity<String> deleteProfileImage(@AuthenticationPrincipal Long userId) {
+
+        s3Service.delete(userId);
+        return ResponseEntity.ok("Deleted profile image");
     }
 }
