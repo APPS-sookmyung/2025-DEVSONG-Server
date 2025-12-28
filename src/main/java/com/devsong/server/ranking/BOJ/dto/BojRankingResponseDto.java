@@ -1,4 +1,4 @@
-package com.devsong.server.ranking.dto;
+package com.devsong.server.ranking.BOJ.dto;
 
 import lombok.Builder;
 import lombok.Data;

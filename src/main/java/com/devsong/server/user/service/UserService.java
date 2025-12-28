@@ -1,6 +1,6 @@
 package com.devsong.server.user.service;
 
-import com.devsong.server.jwt.JwtTokenProvider;
+import com.devsong.server.security.JwtTokenProvider;
 import com.devsong.server.user.dto.*;
 import com.devsong.server.user.entity.Resume;
 import com.devsong.server.user.entity.TechStack;
@@ -61,8 +61,7 @@ public class UserService {
 
         resumeRepository.save(resumeEntity);
 
-        //UserRepository.FindByEmail로 id 찾기
-        Long Id = userRepository.findByEmail(userEntity.getEmail()).getId();
+        Long id = userEntity.getId();
 
         //id 를 ResponseDto로 변환 후 return
         return new SignupResponseDto("SignUp Success");
@@ -75,7 +74,9 @@ public class UserService {
         String password = loginRequestDto.getPassword();
 
         //UserRepository.FindByEmail로 id 찾기
-        User userEntity = userRepository.findByEmail(email);
+        User userEntity = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
 
         //UserRepository에서 비밀번호 일치하는지 확인
         //ResponseDto로 변환 후 return
@@ -97,7 +98,7 @@ public class UserService {
     }
 
     public EmailResponseDto checkEmail(EmailRequestDto emailRequestDto) {
-        boolean isExist = (userRepository.findByEmail(emailRequestDto.getEmail()) != null);
+        boolean isExist = userRepository.findByEmail(emailRequestDto.getEmail()).isPresent();
         return new EmailResponseDto(!isExist);
     }
 
