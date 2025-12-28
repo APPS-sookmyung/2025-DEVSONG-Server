@@ -1,6 +1,7 @@
 package com.devsong.server.user.controller;
 
 import com.devsong.server.user.dto.*;
+import com.devsong.server.user.service.EmailService;
 import com.devsong.server.user.service.UserService;
 import com.devsong.server.user.service.ResumeService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,8 @@ import io.swagger.v3.oas.annotations.Operation;
 public class UserController {
 
     private final UserService userService;
-    private final ResumeService resumeService;//DI
+    private final ResumeService resumeService;
+    private final EmailService emailService; //DI
 
     @Operation(summary = "회원가입")
     @PostMapping("/signup") //회원가입
@@ -36,6 +38,18 @@ public class UserController {
     @PostMapping("/check-email") //이메일 중복확인
     public EmailResponseDto checkEmail(@RequestBody EmailRequestDto emailRequestDto) {
         return userService.checkEmail(emailRequestDto);
+    }
+
+    @Operation(summary = "이메일로 인증번호 전송")
+    @PostMapping("/send-email")
+    public ResponseEntity<String> sendEmail(@RequestBody EmailRequestDto emailRequestDto) {
+        return ResponseEntity.ok(emailService.sendEmail(emailRequestDto));
+    }
+
+    @Operation(summary = "인증번호 일치 확인")
+    @PostMapping("/verify-code")
+    public EmailResponseDto verifyEmail(@RequestBody EmailVerifyRequestDto emailVerifyRequestDto) {
+        return emailService.verifyEmail(emailVerifyRequestDto);
     }
 
     @Operation(summary = "기술스택 등록")
