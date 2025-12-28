@@ -1,6 +1,6 @@
 package com.devsong.server.user.service;
 
-import com.devsong.server.jwt.JwtTokenProvider;
+import com.devsong.server.security.JwtTokenProvider;
 import com.devsong.server.user.dto.*;
 import com.devsong.server.user.entity.Resume;
 import com.devsong.server.user.entity.TechStack;
