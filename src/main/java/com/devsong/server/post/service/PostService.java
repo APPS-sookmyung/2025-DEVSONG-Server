@@ -104,7 +104,7 @@ public class PostService{
         Page<Post> posts;
         boolean sortByLike = "like".equalsIgnoreCase(sortBy);
 
-        if (closed == null) {
+        if (closed == null) { // 모집마감 여부 - 전체
             if (category == null || category.isEmpty()) {
                 posts = sortByLike
                         ? postRepository.findAllByOrderByLikeCountDesc(pageable)
@@ -115,7 +115,18 @@ public class PostService{
                         ? postRepository.findAllByCategoryOrderByLikeCountDesc(categoryEnum, pageable)
                         : postRepository.findAllByCategoryOrderByCreatedAtDesc(categoryEnum, pageable);
             }
-        } else {
+        } else if (closed) { // 모집마감 여부 - 모집완료
+            if (category == null || category.isEmpty()) {
+                posts = sortByLike
+                        ? postRepository.findAllByClosedOrderByLikeCountDesc(closed, pageable)
+                        : postRepository.findAllByClosedOrderByCreatedAtDesc(closed, pageable);
+            } else {
+                Category categoryEnum = Category.from(category);
+                posts = sortByLike
+                        ? postRepository.findAllByCategoryAndClosedOrderByLikeCountDesc(categoryEnum, closed, pageable)
+                        : postRepository.findAllByCategoryAndClosedOrderByCreatedAtDesc(categoryEnum, closed, pageable);
+            }
+        } else { // 모집마감 여부 - 모집중
             if (category == null || category.isEmpty()) {
                 posts = sortByLike
                         ? postRepository.findAllByClosedOrderByLikeCountDesc(closed, pageable)
