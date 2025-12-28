@@ -5,6 +5,7 @@ import com.devsong.server.user.service.UserService;
 import com.devsong.server.user.service.ResumeService;
 import com.devsong.server.user.service.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -93,7 +94,7 @@ public class UserController {
     }
 
     @Operation(summary = "내 프로필 사진 업로드")
-    @PostMapping("/profile/upload")
+    @PostMapping(value = "/profile/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadProfileImage(
             @AuthenticationPrincipal Long userId,
             @RequestPart(value = "image", required = false) MultipartFile image) {
