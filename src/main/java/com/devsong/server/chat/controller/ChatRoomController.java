@@ -12,7 +12,7 @@ import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/chat/rooms")
+@RequestMapping("api/chat/rooms")
 public class ChatRoomController {
 
     private final ChatRoomService chatRoomService;
