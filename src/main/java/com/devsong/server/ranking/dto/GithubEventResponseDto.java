@@ -25,6 +25,7 @@ public class GithubEventResponseDto {
     @Getter
     @NoArgsConstructor
     public static class Commit {
+
         private String sha;
     }
 }

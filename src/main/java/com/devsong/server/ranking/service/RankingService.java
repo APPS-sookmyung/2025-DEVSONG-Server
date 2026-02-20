@@ -32,77 +32,70 @@ public class RankingService {
     @Value("${github.token}")
     private String githubToken;
 
-
-    //백준
-    // 스케줄러 메서드
-    @Scheduled(cron = "0 0 0 * * *") // 매일 0시 0분 0초
+    @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void updateBojRankings() {
-
-        // 백준 아이디 있는 유저 다 가져오기
         List<User> users = userRepository.findAll().stream()
                 .filter(u -> u.getBojId() != null && !u.getBojId().isBlank())
                 .toList();
 
         if (users.isEmpty()) return;
 
-        // API 호출을 위한 핸들 문자열 만들기
         String handles = users.stream()
                 .map(User::getBojId)
                 .map(String::trim)
                 .collect(Collectors.joining(","));
 
-        String url = UriComponentsBuilder.fromHttpUrl("https://solved.ac/api/v3/user/lookup")
+        String url = UriComponentsBuilder
+                .fromHttpUrl("https://solved.ac/api/v3/user/lookup")
                 .queryParam("handles", handles)
                 .toUriString();
 
-        SolvedAcResponseDto[] response = restTemplate.getForObject(url, SolvedAcResponseDto[].class);
+        SolvedAcResponseDto[] response =
+                restTemplate.getForObject(url, SolvedAcResponseDto[].class);
 
         if (response == null) return;
 
+        Map<String, SolvedAcResponseDto> infoMap =
+                Arrays.stream(response)
+                        .collect(Collectors.toMap(
+                                dto -> dto.getHandle().toLowerCase().trim(),
+                                dto -> dto
+                        ));
 
-        // 받아온 데이터를 Map으로 변환
-        Map<String, SolvedAcResponseDto> infoMap = Arrays.stream(response)
-                .collect(Collectors.toMap(
-                        dto -> dto.getHandle().toLowerCase().trim(),
-                        dto -> dto
-                ));
-
-        // DB 유저 정보 업데이트
         for (User user : users) {
-            SolvedAcResponseDto info = infoMap.get(user.getBojId().toLowerCase().trim());
+            SolvedAcResponseDto info =
+                    infoMap.get(user.getBojId().toLowerCase().trim());
             if (info != null) {
-                // User 엔티티에 새로 만든 메서드로 값 갱신
                 user.updateBojInfo(info.getRating(), info.getSolvedCount());
             }
         }
     }
 
-    // 조회 메서드
     @Transactional(readOnly = true)
     public List<BojRankingResponseDto> getBojRanking() {
-        // DB에서 유저 다 가져오기
         List<User> users = userRepository.findAll().stream()
                 .filter(u -> u.getBojId() != null && !u.getBojId().isBlank())
                 .toList();
 
-        // DTO로 변환
         List<BojRankingResponseDto> rankingList = new ArrayList<>();
 
         for (User user : users) {
-            rankingList.add(BojRankingResponseDto.builder()
-                    .rank(0)
-                    .username(user.getUsername())
-                    .bojId(user.getBojId())
-                    .rating(user.getBojRating())
-                    .solvedCount(user.getBojSolvedCount())
-                    .build());
+            rankingList.add(
+                    BojRankingResponseDto.builder()
+                            .rank(0)
+                            .username(user.getUsername())
+                            .bojId(user.getBojId())
+                            .rating(user.getBojRating())
+                            .solvedCount(user.getBojSolvedCount())
+                            .build()
+            );
         }
 
-        // 정렬 (레이팅 내림차순)
-        rankingList.sort(Comparator.comparingInt(BojRankingResponseDto::getRating).reversed());
+        rankingList.sort(
+                Comparator.comparingInt(BojRankingResponseDto::getRating).reversed()
+        );
 
-        // 등수 매기기
         for (int i = 0; i < rankingList.size(); i++) {
             rankingList.get(i).setRank(i + 1);
         }
@@ -110,21 +103,19 @@ public class RankingService {
         return rankingList;
     }
 
-    //깃허브
-    @Scheduled(cron = "0 0 0 * * *") // 매일 0시 0분 0초
+    @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void updateGithubRankings() {
+        LocalDate weekStart =
+                LocalDate.now(ZoneId.of("Asia/Seoul"))
+                        .with(DayOfWeek.MONDAY);
 
-        LocalDate weekStart = LocalDate.now(ZoneId.of("Asia/Seoul")).with(DayOfWeek.MONDAY);
-
-        //깃허브 아이디 있는 유저만 조회
         List<User> users = userRepository.findAll().stream()
                 .filter(u -> u.getGithubId() != null && !u.getGithubId().isBlank())
                 .toList();
 
         if (users.isEmpty()) return;
 
-        //각 유저별로 주간 커밋 수 계산
         for (User user : users) {
             int weeklyCommitCount =
                     fetchWeeklyCommitCount(user.getGithubId(), weekStart);
@@ -132,15 +123,11 @@ public class RankingService {
         }
     }
 
-    //주간 커밋 수 집계
     private int fetchWeeklyCommitCount(String githubId, LocalDate weekStart) {
-
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(githubToken.trim());
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-
-        //Github Event API
         String url = UriComponentsBuilder
                 .fromHttpUrl("https://api.github.com/users/{username}/events/public")
                 .queryParam("per_page", 100)
@@ -159,22 +146,20 @@ public class RankingService {
         if (events == null) return 0;
 
         LocalDate weekEnd = weekStart.plusDays(7);
-
         int commitCount = 0;
 
         for (GithubEventResponseDto event : events) {
-
             if (!"PushEvent".equals(event.getType())) continue;
 
             ZonedDateTime eventTimeUtc =
                     ZonedDateTime.parse(event.getCreated_at());
 
             LocalDate eventDateKst =
-                    eventTimeUtc
-                            .withZoneSameInstant(ZoneId.of("Asia/Seoul"))
+                    eventTimeUtc.withZoneSameInstant(ZoneId.of("Asia/Seoul"))
                             .toLocalDate();
 
-            if (eventDateKst.isBefore(weekStart) || !eventDateKst.isBefore(weekEnd)) continue;
+            if (eventDateKst.isBefore(weekStart) ||
+                    !eventDateKst.isBefore(weekEnd)) continue;
 
             commitCount += 1;
         }
@@ -182,17 +167,13 @@ public class RankingService {
         return commitCount;
     }
 
-    // 조회 메서드
     @Transactional(readOnly = true)
     public List<GithubRankingResponseDto> getGithubRanking() {
-
         List<User> users = userRepository.findAll().stream()
                 .filter(u -> u.getGithubId() != null && !u.getGithubId().isBlank())
                 .toList();
 
-        if (users.isEmpty()) {
-            return Collections.emptyList();
-        }
+        if (users.isEmpty()) return Collections.emptyList();
 
         List<GithubRankingResponseDto> rankingList = new ArrayList<>();
 
@@ -208,8 +189,7 @@ public class RankingService {
         }
 
         rankingList.sort(
-                Comparator.comparingInt(GithubRankingResponseDto::getCommitCount)
-                        .reversed()
+                Comparator.comparingInt(GithubRankingResponseDto::getCommitCount).reversed()
         );
 
         for (int i = 0; i < rankingList.size(); i++) {
