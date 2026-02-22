@@ -92,4 +92,12 @@ public class User {
         this.profileImageUrl = null;
         this.profileS3Key = null;
     }
+
+    // 마이페이지 프로필 수정
+    public void updateMyPageInfo(String username, Long studentId, String major, String email) {
+        if (username != null) this.username = username;
+        if (studentId != null) this.studentId = studentId;
+        if (major != null) this.major = major;
+        if (email != null) this.email = email;
+    }
 }

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 public class MyPostDto {
-    private final Long postId;
+    private final Long id;
     private final String title;      // 제목
     private final String preview;    // 미리보기
     private final Category category; // 카테고리
@@ -20,6 +20,6 @@ public class MyPostDto {
     private final LocalDateTime createdAt;  // 작성 시간
 
     private final boolean closed;   // 모집 마감 여부
-    private final Long like;        // 좋아요 수
+    private final Long likeCount;        // 좋아요 수
     private final Long comment;     // 댓글 수
 }
