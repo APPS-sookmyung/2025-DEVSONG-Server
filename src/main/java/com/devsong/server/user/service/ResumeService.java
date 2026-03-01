@@ -26,7 +26,8 @@ public class ResumeService {
         User user = resume.getUser();
 
         return ResumeResponseDto.builder()
-                .profileImage(resume.getProfileImage())
+                //.profileImage(resume.getProfileImage())
+                .profileImage(user.getProfileImageUrl())
                 .username(user.getUsername())
                 .studentId(user.getStudentId())
                 .major(user.getMajor())

@@ -143,14 +143,14 @@ public class UserService {
     public List<MyPostDto> getMyPosts(Long userId) {
         return postRepository.findByUserIdOrderByIdDesc(userId).stream()
                 .map(post -> MyPostDto.builder()
-                        .postId(post.getId())
+                        .id(post.getId())
                         .title(post.getTitle())
                         .preview(preview(post.getContent(), 35))
                         .category(post.getCategory())
                         .username(post.getUser().getUsername())
                         .createdAt(post.getCreatedAt())
                         .closed(post.isClosed())
-                        .like(postLikeRepository.countByPostId(post.getId()))
+                        .likeCount(postLikeRepository.countByPostId(post.getId()))
                         .comment(commentRepository.countByPostId(post.getId()))
                         .build())
                 .collect(Collectors.toList());
@@ -162,14 +162,14 @@ public class UserService {
                 .map(comment -> {
                     var post = comment.getPost();
                     return MyPostDto.builder()
-                            .postId(post.getId())
+                            .id(post.getId())
                             .title(post.getTitle())
                             .preview(preview(post.getContent(), 35))
                             .category(post.getCategory())
                             .username(post.getUser().getUsername())
                             .createdAt(post.getCreatedAt())
                             .closed(post.isClosed())
-                            .like(postLikeRepository.countByPostId(post.getId()))
+                            .likeCount(postLikeRepository.countByPostId(post.getId()))
                             .comment(commentRepository.countByPostId(post.getId()))
                             .build();
                 })
@@ -181,14 +181,14 @@ public class UserService {
         return postLikeRepository.findByUserId(userId).stream()
                 .map(PostLike::getPost)
                 .map(post -> MyPostDto.builder()
-                        .postId(post.getId())
+                        .id(post.getId())
                         .title(post.getTitle())
                         .preview(preview(post.getContent(), 35))
                         .category(post.getCategory())
                         .username(post.getUser().getUsername())
                         .createdAt(post.getCreatedAt())
                         .closed(post.isClosed())
-                        .like(postLikeRepository.countByPostId(post.getId()))
+                        .likeCount(postLikeRepository.countByPostId(post.getId()))
                         .comment(commentRepository.countByPostId(post.getId()))
                         .build())
                 .collect(Collectors.toList());
@@ -199,16 +199,57 @@ public class UserService {
         return postApplyRepository.findByUserId(userId).stream()
                 .map(PostApply::getPost)
                 .map(post -> MyPostDto.builder()
-                        .postId(post.getId())
+                        .id(post.getId())
                         .title(post.getTitle())
                         .preview(preview(post.getContent(), 35))
                         .category(post.getCategory())
                         .username(post.getUser().getUsername())
                         .createdAt(post.getCreatedAt())
                         .closed(post.isClosed())
-                        .like(postLikeRepository.countByPostId(post.getId()))
+                        .likeCount(postLikeRepository.countByPostId(post.getId()))
                         .comment(commentRepository.countByPostId(post.getId()))
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    // 마이페이지 프로필
+    public MyPageProfileResponseDto getMyProfile(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        return MyPageProfileResponseDto.builder()
+                .profileImageUrl(user.getProfileImageUrl())
+                .username(user.getUsername())
+                .studentId(user.getStudentId())
+                .major(user.getMajor())
+                .email(user.getEmail())
+                .build();
+    }
+
+    // 마이페이지 프로필 수정
+    @Transactional
+    public MyPageProfileResponseDto updateMyProfile(
+            Long userId,
+            MyPageUpdateRequestDto dto
+    ) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        user.updateMyPageInfo(
+                dto.getUsername(),
+                dto.getStudentId(),
+                dto.getMajor(),
+                dto.getEmail()
+        );
+
+        return MyPageProfileResponseDto.builder()
+                .profileImageUrl(user.getProfileImageUrl())
+                .username(user.getUsername())
+                .studentId(user.getStudentId())
+                .major(user.getMajor())
+                .email(user.getEmail())
+                .build();
     }
 }
