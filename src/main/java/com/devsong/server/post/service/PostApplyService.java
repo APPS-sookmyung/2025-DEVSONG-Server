@@ -7,10 +7,7 @@ import com.devsong.server.post.entity.Post;
 import com.devsong.server.post.entity.PostApply;
 import com.devsong.server.post.repository.PostApplyRepository;
 import com.devsong.server.post.repository.PostRepository;
-import com.devsong.server.user.dto.ResumeResponseDto;
-import com.devsong.server.user.entity.Resume;
 import com.devsong.server.user.entity.User;
-import com.devsong.server.user.repository.ResumeRepository;
 import com.devsong.server.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +26,6 @@ public class PostApplyService {
     private final PostApplyRepository postApplyRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
-    private final ResumeRepository resumeRepository;
 
     @Transactional
     public PostApplyResponseDto applyPost(PostApplyRequestDto dto) {
@@ -86,52 +82,5 @@ public class PostApplyService {
                         .studentId(apply.getUser().getStudentId())
                         .build())
                 .toList();
-    }
-
-    @Transactional
-    public ResumeResponseDto getApplicantResume(
-            Long postId,
-            Long applicantId,
-            Long loginUserId
-    ) {
-        // 게시글 존재 확인
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
-
-        // 로그인한 유저가 게시글 작성자인지 확인
-        if (!post.getUser().getId().equals(loginUserId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not Authorized");
-        }
-
-        // 해당 지원자가 이 게시글에 지원했는지 확인
-        boolean applied = postApplyRepository
-                .existsByPostIdAndUserId(postId, applicantId);
-
-        if (!applied) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "User did not apply to this post"
-            );
-        }
-
-        // 지원자의 이력서 조회
-        Resume resume = resumeRepository.findByUserId(applicantId)
-                .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Resume not found"));
-
-        User user = resume.getUser();
-
-        return ResumeResponseDto.builder()
-                .profileImage(resume.getProfileImage())
-                .username(user.getUsername())
-                .studentId(user.getStudentId())
-                .major(user.getMajor())
-                .bojId(user.getBojId())
-                .githubId(user.getGithubId())
-                .techStack(user.getTechStack())
-                .interests(resume.getInterests())
-                .content(resume.getContent())
-                .build();
     }
 }

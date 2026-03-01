@@ -1,6 +1,5 @@
 package com.devsong.server.user.dto;
 
-import com.devsong.server.user.entity.Interests;
 import com.devsong.server.user.entity.TechStack;
 import lombok.*;
 
@@ -26,7 +25,7 @@ public class ResumeResponseDto {
 
     private List<TechStack> techStack; //기술스택
 
-    private List<Interests> interests; //관심분야
+    private List<String> interests; //관심분야
 
     private String content; //자기소개
 

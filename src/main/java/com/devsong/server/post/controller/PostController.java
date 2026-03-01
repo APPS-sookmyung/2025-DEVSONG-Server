@@ -3,7 +3,6 @@ package com.devsong.server.post.controller;
 import com.devsong.server.post.dto.*;
 import com.devsong.server.post.entity.Category;
 import com.devsong.server.post.service.*;
-import com.devsong.server.user.dto.ResumeResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -127,20 +126,7 @@ public class PostController {
 
         return ResponseEntity.ok(response);
     }
-
-    // 지원자의 이력서 조회 (게시글 작성자만 가능)
-    @Operation(summary = "지원자 이력서 조회")
-    @GetMapping("/{postId}/applicants/{applicantId}/resume")
-    public ResponseEntity<ResumeResponseDto> getApplicantResume(
-            @PathVariable Long postId,
-            @PathVariable Long applicantId
-    ) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Long loginUserId = (Long) auth.getPrincipal();
-
-        ResumeResponseDto response =
-                postApplyService.getApplicantResume(postId, applicantId, loginUserId);
-
-        return ResponseEntity.ok(response);
-    }
 }
+
+
+
