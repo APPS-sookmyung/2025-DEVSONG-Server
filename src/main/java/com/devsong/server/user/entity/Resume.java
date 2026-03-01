@@ -27,12 +27,18 @@ public class Resume {
 
     @Builder.Default
     @ElementCollection(fetch = FetchType.LAZY)
+    @Enumerated(EnumType.STRING)
     @CollectionTable(name = "resume_interests", joinColumns = @JoinColumn(name = "resume_id"))
     @Column(name = "interest")
-    private List<String> interests = new ArrayList<>(); // TechStack -> String 변경
+    private List<Interests> interests = new ArrayList<>(); // TechStack -> Interests 변경
 
-    public void update(List<String> interests, String content, String profileImage) {
-        this.interests = interests;
+    public void update(List<Interests> interests, String content, String profileImage) {
+
+        this.interests.clear();      // 기존 값 삭제
+        if (interests != null) {
+            this.interests.addAll(interests);  // 새 값 추가
+        }
+
         this.content = content;
         this.profileImage = profileImage;
     }
