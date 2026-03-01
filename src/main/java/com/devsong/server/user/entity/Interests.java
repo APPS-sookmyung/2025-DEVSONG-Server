@@ -1,0 +1,25 @@
+package com.devsong.server.user.entity;
+
+public enum Interests {
+    WEB_FRONTEND,
+    WEB_BACKEND,
+    MOBILE_DEVELOPMENT,
+    ANDROID,
+    IOS,
+    GAME,
+    DATA_ANALYTICS,
+    AI_ML,
+    EMBEDDED_SYSTEMS,
+    BLOCKCHAIN,
+    ALGORITHMS_DATA_STRUCTURES,
+    NETWORK_SECURITY,
+    SYSTEM_PROGRAMMING,
+    FULLSTACK,
+    OS_COMPILERS,
+    DATABASE,
+    STARTUP,
+    RESEARCH,
+    HACKATHON,
+    OPEN_SOURCE,
+    UX_UI
+}

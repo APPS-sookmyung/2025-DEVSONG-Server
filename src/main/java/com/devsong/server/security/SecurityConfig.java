@@ -24,7 +24,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         //회원가입, 로그인, 채팅 api 요청, swagger api 문서는 토큰 없이 가능하도록 허용
-                        .requestMatchers("/api/user/signup", "/api/user/login", "/api/user/check-email", "/api/user/send-email", "/api/user/verify-code", "/swagger-ui/index.html",
+                        .requestMatchers("/api/user/signup", "/api/user/login", "/api/user/check-email", "/api/user/send-email", "/api/user/verify-code", "/favicon.ico", "/error", "/swagger-ui/index.html",
                                 "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", "/ws/**", "/app/**","/topic/**").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -38,12 +38,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-//        configuration.setAllowedOriginPatterns(List.of(
-//                "http://localhost:*",
-//                "file://*"
-//        ));
-
-        configuration.setAllowedOriginPatterns(List.of("*"));
+        configuration.setAllowedOriginPatterns(List.of(
+                "http://localhost:*",
+                "file://*"
+        ));
         configuration.setAllowCredentials(true);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));

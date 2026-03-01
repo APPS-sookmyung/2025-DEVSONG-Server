@@ -1,5 +1,6 @@
 package com.devsong.server.chat.config;
 
+import com.devsong.server.chat.service.ChatRoomService;
 import com.devsong.server.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,8 @@ import java.util.Map;
 public class StompAuthChannelInterceptor implements ChannelInterceptor {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final ChatRoomService chatRoomService;
+
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -40,14 +43,13 @@ public class StompAuthChannelInterceptor implements ChannelInterceptor {
 
             String token = null;
 
-            // 1️⃣ Authorization 헤더에서 먼저 시도
             String authHeader = accessor.getFirstNativeHeader("Authorization");
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 token = authHeader.substring(7);
                 log.info("[STOMP][CONNECT] token from Authorization header");
             }
 
-            // 2️⃣ 없으면 URL 파라미터(token)에서 시도 (SockJS)
+
             if (token == null) {
                 Map<String, Object> sessionAttrs = accessor.getSessionAttributes();
                 if (sessionAttrs != null && sessionAttrs.get("token") != null) {
@@ -56,19 +58,16 @@ public class StompAuthChannelInterceptor implements ChannelInterceptor {
                 }
             }
 
-            // 3️⃣ 토큰 없으면 즉시 차단
             if (token == null) {
                 log.error("[STOMP][CONNECT] No JWT token found");
                 throw new IllegalArgumentException("No JWT token");
             }
 
-            // 4️⃣ 토큰 검증
             if (!jwtTokenProvider.validateToken(token)) {
                 log.error("[STOMP][CONNECT] Invalid JWT token");
                 throw new IllegalArgumentException("Invalid JWT token");
             }
 
-            // 5️⃣ 사용자 식별
             Long userId = jwtTokenProvider.getUserId(token);
             log.info("[STOMP][CONNECT] authenticated userId = {}", userId);
 
@@ -81,6 +80,45 @@ public class StompAuthChannelInterceptor implements ChannelInterceptor {
 
             accessor.setUser(authentication);
             log.info("[STOMP][CONNECT] Authentication set successfully");
+        }
+
+        //승인한 참가자 외 채팅방 접근 차단
+        if (StompCommand.SUBSCRIBE.equals(command)) {
+
+            if (accessor.getUser() == null) {
+                log.error("[STOMP][SUBSCRIBE] No authenticated user");
+                throw new IllegalArgumentException("No authenticated");
+            }
+
+            Long userId = Long.valueOf(accessor.getUser().getName());
+            String dest = accessor.getDestination();
+            log.info("[STOMP][SUBSCRIBE] userId={}, destination={}", userId, dest);
+
+            if (dest == null) {
+                throw new IllegalArgumentException("No destination");
+            }
+
+            String prefix = "/topic/chat/room/";
+            if (dest.startsWith(prefix)) {
+
+                String roomIdStr = dest.substring(prefix.length());
+                Long roomId;
+
+                try {
+                    roomId = Long.valueOf(roomIdStr);
+                } catch (NumberFormatException e) {
+                    log.error("[STOMP][SUBSCRIBE] Invalid roomId in destination: {}", dest);
+                    throw new IllegalArgumentException("Invalid destination");
+                }
+
+                boolean ok = chatRoomService.isParticipant(roomId, userId);
+                if (!ok) {
+                    log.error("[STOMP][SUBSCRIBE] Not authorized. userId={}, roomId={}", userId, roomId);
+                    throw new IllegalArgumentException("Not authorized");
+                }
+
+                log.info("[STOMP][SUBSCRIBE] Authorized. userId={}, roomId={}", userId, roomId);
+            }
         }
 
         return message;
