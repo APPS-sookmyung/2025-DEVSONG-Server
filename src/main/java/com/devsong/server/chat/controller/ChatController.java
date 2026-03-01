@@ -2,14 +2,13 @@ package com.devsong.server.chat.controller;
 
 import com.devsong.server.chat.dto.ChatMessageDto;
 import com.devsong.server.chat.dto.ChatMessageResponseDto;
-import com.devsong.server.chat.entity.ChatMessage;
 import com.devsong.server.chat.service.ChatService;
-import com.devsong.server.user.entity.User;
 import com.devsong.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class ChatController {
@@ -44,7 +43,10 @@ public class ChatController {
             @PathVariable Long roomId,
             Authentication authentication
     ) {
-        Long me = (Long) authentication.getPrincipal();
+        if (authentication == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
+        Long me = Long.valueOf(authentication.getName());
         return chatService.getMessages(roomId, me);
     }
 
