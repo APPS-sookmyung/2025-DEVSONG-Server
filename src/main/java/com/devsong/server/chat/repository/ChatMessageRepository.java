@@ -19,8 +19,7 @@ public interface ChatMessageRepository
     long countByRoom_IdAndIdGreaterThanAndSenderIdNot(Long roomId, Long lastReadMessageId, Long senderId);
 
     //마지막 메세지 id
-    @Query("select max(m.id) from ChatMessage m where m.room.id = :roomId")
-    Long findLatestMessageId(@Param("roomId") Long roomId);
+    Optional<ChatMessage> findFirstByRoom_IdOrderByCreatedAtDescIdDesc(Long roomId);
 
 }
 

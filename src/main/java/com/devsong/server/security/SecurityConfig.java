@@ -24,7 +24,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         //회원가입, 로그인, 채팅 api 요청, swagger api 문서는 토큰 없이 가능하도록 허용
-                        .requestMatchers("/user/signup", "/user/login", "/user/check-email", "/user/send-email", "/user/verify-code", "/test1.html", "/test2.html", "/favicon.ico", "/error", "/swagger-ui/index.html",
+                        .requestMatchers("/user/signup", "/user/login", "/user/check-email", "/user/send-email", "/user/verify-code", "/favicon.ico", "/error", "/swagger-ui/index.html",
                                 "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", "/ws/**", "/app/**","/topic/**").permitAll()
                         .anyRequest().authenticated()
                 )

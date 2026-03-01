@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"userLowId", "userHighId"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"user_low_id", "user_high_id"}))
 public class ChatRoom {
 
     @Id

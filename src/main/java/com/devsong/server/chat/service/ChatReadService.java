@@ -1,5 +1,6 @@
 package com.devsong.server.chat.service;
 
+import com.devsong.server.chat.entity.ChatMessage;
 import com.devsong.server.chat.repository.ChatMessageRepository;
 import com.devsong.server.chat.repository.ChatRoomMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,10 @@ public class ChatReadService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not authorized");
         }
 
-        Long latestMessageId = chatMessageRepository.findLatestMessageId(roomId);
+        Long latestMessageId = chatMessageRepository
+                .findFirstByRoom_IdOrderByCreatedAtDescIdDesc(roomId)
+                .map(ChatMessage::getId)
+                .orElse(null);
         if (latestMessageId == null) return; //메세지 없을 시
 
         chatRoomMemberRepository.advanceLastRead(roomId, me, latestMessageId);
