@@ -29,6 +29,9 @@ public class ChatRoom {
     private Long lastMessageId;
 
     public ChatRoom(Long userA, Long userB) {
+        if (userA.equals(userB)) {
+            throw new IllegalArgumentException("Cannot create chat room with self");
+            }
         long low = Math.min(userA, userB);
         long high = Math.max(userA, userB);
         this.userLowId = low;

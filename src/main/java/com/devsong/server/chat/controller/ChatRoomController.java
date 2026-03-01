@@ -5,6 +5,8 @@ import com.devsong.server.chat.dto.ChatRoomListResponseDto;
 import com.devsong.server.chat.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.List;
@@ -22,7 +24,7 @@ public class ChatRoomController {
             @RequestParam Long targetUserId, Principal principal
     ) {
         if (principal == null) {
-            throw new IllegalStateException("Authentication required");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
         }
         Long myId = Long.parseLong(principal.getName());
         Long roomId = chatRoomService.getRoom(myId, targetUserId);
@@ -33,7 +35,7 @@ public class ChatRoomController {
     @GetMapping
     public List<ChatRoomListResponseDto> myRooms(Principal principal) {
         if (principal == null) {
-            throw new IllegalStateException("Authentication required");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
         }
         Long myId = Long.parseLong(principal.getName());
 
