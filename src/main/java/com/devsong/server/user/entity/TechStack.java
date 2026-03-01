@@ -39,6 +39,5 @@ public enum TechStack {
     MYSQL,
     POSTGRESQL,
     MONGODB,
-    VS_CODE,
-    AI_ML
+    VS_CODE
 }

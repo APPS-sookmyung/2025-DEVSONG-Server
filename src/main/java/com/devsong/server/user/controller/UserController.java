@@ -124,21 +124,4 @@ public class UserController {
         s3Service.delete(userId);
         return ResponseEntity.ok("Deleted profile image");
     }
-
-    @Operation(summary = "마이페이지 프로필 조회")
-    @GetMapping("/me")
-    public ResponseEntity<MyPageProfileResponseDto> getMyProfile(
-            @AuthenticationPrincipal Long userId) {
-
-        return ResponseEntity.ok(userService.getMyProfile(userId));
-    }
-
-    @Operation(summary = "내 프로필 수정")
-    @PostMapping("/me")
-    public ResponseEntity<MyPageProfileResponseDto> updateMyProfile(
-            @AuthenticationPrincipal Long userId,
-            @RequestBody MyPageUpdateRequestDto dto) {
-
-        return ResponseEntity.ok(userService.updateMyProfile(userId, dto));
-    }
 }

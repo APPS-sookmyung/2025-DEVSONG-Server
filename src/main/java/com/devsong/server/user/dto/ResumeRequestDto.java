@@ -1,6 +1,6 @@
 package com.devsong.server.user.dto;
 
-import com.devsong.server.user.entity.Interests;
+import com.devsong.server.user.entity.TechStack;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class ResumeRequestDto {
-    private List<Interests> interests;
+    private List<TechStack> interests;
     private String content;
     private String profileImage;
 }
