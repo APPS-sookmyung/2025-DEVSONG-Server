@@ -14,11 +14,12 @@ public class ChatMessage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; //pk
-    
-    @JoinColumn(name = "room_id", nullable = false)
-    private Long roomId; //방
 
-    @JoinColumn(name = "sender_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "room_id", nullable = false)
+    private ChatRoom room; //방
+
+    @Column(name = "sender_id", nullable = false)
     private Long senderId; //보낸사람
 
     @Column(nullable = false, length = 2000)
@@ -26,8 +27,8 @@ public class ChatMessage {
 
     private LocalDateTime createdAt; //작성시간
 
-    public ChatMessage(Long roomId, Long senderId, String content) {
-        this.roomId = roomId; //방
+    public ChatMessage(ChatRoom room, Long senderId, String content) {
+        this.room = room; //방
         this.senderId = senderId; //보낸사람
         this.content = content; //내용
         this.createdAt = LocalDateTime.now(); //작성시간

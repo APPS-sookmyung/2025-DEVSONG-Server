@@ -1,18 +1,19 @@
 package com.devsong.server.chat.controller;
 
 import com.devsong.server.chat.dto.ChatRoomCreateResponseDto;
+import com.devsong.server.chat.dto.ChatRoomListResponseDto;
 import com.devsong.server.chat.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/chat/rooms")
+@RequestMapping("/api/chat/rooms")
 public class ChatRoomController {
 
     private final ChatRoomService chatRoomService;
@@ -23,11 +24,22 @@ public class ChatRoomController {
             @RequestParam Long targetUserId, Principal principal
     ) {
         if (principal == null) {
-            throw new IllegalStateException("Authentication required");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
         }
         Long myId = Long.parseLong(principal.getName());
         Long roomId = chatRoomService.getRoom(myId, targetUserId);
         return new ChatRoomCreateResponseDto(roomId);
+    }
+
+    //채팅방 목록
+    @GetMapping
+    public List<ChatRoomListResponseDto> myRooms(Principal principal) {
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
+        Long myId = Long.parseLong(principal.getName());
+
+        return chatRoomService.getMyRooms(myId);
     }
 }
 
