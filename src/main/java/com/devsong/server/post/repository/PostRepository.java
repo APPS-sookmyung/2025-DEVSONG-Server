@@ -26,10 +26,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByUserIdOrderByIdDesc(Long userId);
 
     // 모집여부별 조회 - 최신순
-    Page<Post> findAllByClosedOrderByCreatedAtDesc(boolean closed, Pageable pageable);
+    Page<Post> findAllByCategoryInAndClosedOrderByCreatedAtDesc(
+            List<Category> categories, boolean closed, Pageable pageable);
 
     // 모집여부별 조회 - 좋아요순
-    Page<Post> findAllByClosedOrderByLikeCountDesc(boolean closed, Pageable pageable);
+    Page<Post> findAllByCategoryInAndClosedOrderByLikeCountDesc(
+            List<Category> categories, boolean closed, Pageable pageable);
 
     // 카테고리+모집여부별 조회 - 최신순
     Page<Post> findAllByCategoryAndClosedOrderByCreatedAtDesc(Category category, boolean closed, Pageable pageable);
