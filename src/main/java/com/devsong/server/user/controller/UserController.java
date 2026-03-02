@@ -141,4 +141,12 @@ public class UserController {
 
         return ResponseEntity.ok(userService.updateMyProfile(userId, dto));
     }
+
+    @Operation(summary = "특정 유저 이력서 조회")
+    @GetMapping("/{userId}/resume")
+    public ResponseEntity<ResumeResponseDto> getUserResume(
+            @PathVariable Long userId
+    ) {
+        return ResponseEntity.ok(resumeService.getUserResume(userId));
+    }
 }
