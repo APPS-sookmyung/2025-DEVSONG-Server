@@ -1,12 +1,22 @@
 # 2025-DEVSONG-Server
+<img width="1280" height="720" alt="devsong_thumbnail" src="https://github.com/user-attachments/assets/69dd039f-0410-49f4-91fb-c2d0cf443fff" />
 
-## 🏄🏻‍♀️ 개발 팀 소개
+## 🏄🏻‍♀️ Team
 
+| name                                        | major        | role | Email                    |
+| -------------------------------------------- | -------------- | ------ |--------------------------|
+| [CHAEAH WOO](https://github.com/chaeeah) | Computer Science | PM / BE | chaeah23@sookmyung.ac.kr |
+| [SUMIN BAEK](https://github.com/suminb99) | Computer Science | FE | suminb99@sookmyung.ac.kr |
+| [JIHEE BANG](https://github.com/Bangjh05) | Computer Science | FE / BE | bangjh@sookmyung.ac.kr   |
+| [EUNCHAE LEE](https://github.com/echae0111) | Computer Science | BE |                          |
+| [DOYEON KIM](https://github.com/) | Visual Design | DESIGN |                          |
 <br />
 
 ## 📅 개발 기간
 
-<br />
+2025년 6월 ~
+
+<br/>
 
 ## 📌 Git Convention
 
