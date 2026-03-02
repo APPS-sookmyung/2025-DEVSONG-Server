@@ -64,4 +64,27 @@ public class ResumeService {
                 .message("Update Success")
                 .build();
     }
+
+    //특정 유저 이력서 조회
+    @Transactional
+    public ResumeResponseDto getUserResume(Long userId) {
+
+        Resume resume = resumeRepository.findByUserId(userId)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Resume not found"));
+
+        User user = resume.getUser();
+
+        return ResumeResponseDto.builder()
+                .profileImage(resume.getProfileImage())
+                .username(user.getUsername())
+                .studentId(user.getStudentId())
+                .major(user.getMajor())
+                .bojId(user.getBojId())
+                .githubId(user.getGithubId())
+                .techStack(user.getTechStack())
+                .interests(resume.getInterests())
+                .content(resume.getContent())
+                .build();
+    }
 }
