@@ -19,7 +19,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/post")
+@RequestMapping("/api/post")
 @CrossOrigin(origins = "http://localhost:5173")
 public class PostController {
 
