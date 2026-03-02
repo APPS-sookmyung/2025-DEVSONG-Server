@@ -101,6 +101,13 @@ public class PostService{
     public PostPageResponseDto findPosts(String category, String sortBy, int page, Boolean closed) {
         Pageable pageable = PageRequest.of(page, 10); // 한 페이지당 10개 고정
 
+        //모집 마감 여부로 조회 시 프로젝트, 스터디, 대외활동 카테고리에서만 가져옴
+        List<Category> recruitCategories = List.of(
+                Category.PROJECT,
+                Category.STUDY,
+                Category.EXTRA
+        );
+
         Page<Post> posts;
         boolean sortByLike = "like".equalsIgnoreCase(sortBy);
 
@@ -118,8 +125,8 @@ public class PostService{
         } else if (closed) { // 모집마감 여부 - 모집완료
             if (category == null || category.isEmpty()) {
                 posts = sortByLike
-                        ? postRepository.findAllByClosedOrderByLikeCountDesc(closed, pageable)
-                        : postRepository.findAllByClosedOrderByCreatedAtDesc(closed, pageable);
+                        ? postRepository.findAllByCategoryInAndClosedOrderByLikeCountDesc(recruitCategories, closed, pageable)
+                        : postRepository.findAllByCategoryInAndClosedOrderByCreatedAtDesc(recruitCategories, closed, pageable);
             } else {
                 Category categoryEnum = Category.from(category);
                 posts = sortByLike
@@ -129,8 +136,8 @@ public class PostService{
         } else { // 모집마감 여부 - 모집중
             if (category == null || category.isEmpty()) {
                 posts = sortByLike
-                        ? postRepository.findAllByClosedOrderByLikeCountDesc(closed, pageable)
-                        : postRepository.findAllByClosedOrderByCreatedAtDesc(closed, pageable);
+                        ? postRepository.findAllByCategoryInAndClosedOrderByLikeCountDesc(recruitCategories, closed, pageable)
+                        : postRepository.findAllByCategoryInAndClosedOrderByCreatedAtDesc(recruitCategories, closed, pageable);
             } else {
                 Category categoryEnum = Category.from(category);
                 posts = sortByLike
